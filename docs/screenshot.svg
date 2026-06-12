@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <rect width="1200" height="760" fill="#0d0e12"/>
+  <rect x="0" y="0" width="322" height="760" fill="#15171e"/>
+  <rect x="321" y="0" width="2" height="760" fill="#262936"/>
+
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="16">
+    <text x="24" y="38" fill="#e2e8f0" font-size="20" font-weight="700">Qt Maze Generator</text>
+
+    <g transform="translate(20 62)">
+      <rect width="282" height="96" rx="8" fill="#1a1c24" stroke="#262936"/>
+      <text x="16" y="28" fill="#00f2fe" font-size="13" font-weight="700">GRID SETTINGS</text>
+      <text x="18" y="58" fill="#94a3b8">Grid Width</text>
+      <rect x="158" y="42" width="96" height="28" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="190" y="62" fill="#f1f5f9">31</text>
+      <text x="18" y="86" fill="#94a3b8">Grid Height</text>
+      <rect x="158" y="70" width="96" height="28" rx="6" fill="#222530" stroke="#32374a"/>
+    </g>
+
+    <g transform="translate(20 178)">
+      <rect width="282" height="128" rx="8" fill="#1a1c24" stroke="#262936"/>
+      <text x="16" y="28" fill="#00f2fe" font-size="13" font-weight="700">MAZE GENERATOR</text>
+      <rect x="16" y="44" width="250" height="34" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="30" y="67" fill="#f1f5f9">DFS (Backtracker)</text>
+      <rect x="16" y="88" width="120" height="30" rx="6" fill="#7f00ff"/>
+      <text x="42" y="109" fill="#ffffff" font-weight="700">Generate</text>
+      <rect x="146" y="88" width="120" height="30" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="184" y="109" fill="#e2e8f0" font-weight="700">Instant</text>
+    </g>
+
+    <g transform="translate(20 326)">
+      <rect width="282" height="128" rx="8" fill="#1a1c24" stroke="#262936"/>
+      <text x="16" y="28" fill="#00f2fe" font-size="13" font-weight="700">MAZE SOLVER</text>
+      <rect x="16" y="44" width="250" height="34" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="30" y="67" fill="#f1f5f9">A* Search Algorithm</text>
+      <rect x="16" y="88" width="120" height="30" rx="6" fill="#0072ff"/>
+      <text x="56" y="109" fill="#ffffff" font-weight="700">Solve</text>
+      <rect x="146" y="88" width="120" height="30" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="184" y="109" fill="#e2e8f0" font-weight="700">Instant</text>
+    </g>
+
+    <g transform="translate(20 474)">
+      <rect width="282" height="140" rx="8" fill="#1a1c24" stroke="#262936"/>
+      <text x="16" y="28" fill="#00f2fe" font-size="13" font-weight="700">SIMULATION CONTROLS</text>
+      <text x="18" y="62" fill="#94a3b8">Delay</text>
+      <rect x="82" y="54" width="122" height="6" rx="3" fill="#00f2fe"/>
+      <circle cx="174" cy="57" r="8" fill="#f1f5f9" stroke="#00f2fe"/>
+      <text x="214" y="62" fill="#94a3b8" font-size="13">15 ms x16</text>
+      <rect x="16" y="80" width="120" height="30" rx="6" fill="#222530" stroke="#10b981"/>
+      <text x="56" y="101" fill="#10b981" font-weight="700">Pause</text>
+      <rect x="146" y="80" width="120" height="30" rx="6" fill="#222530" stroke="#32374a"/>
+      <text x="188" y="101" fill="#e2e8f0" font-weight="700">Step</text>
+      <rect x="16" y="116" width="250" height="16" rx="6" fill="#101116" stroke="#262936"/>
+    </g>
+  </g>
+
+  <g transform="translate(358 36)">
+    <rect width="806" height="688" fill="#0d0e12"/>
+    <g stroke="#1e2230" stroke-width="7" stroke-linecap="square">
+      <path d="M18 18H788M18 18V670M18 670H788M788 18V670"/>
+      <path d="M65 18V252M65 299V670M112 65H300M347 65H535M582 65H741"/>
+      <path d="M112 112V206M112 253H253M300 112V394M347 112H488M535 112V253M582 112H741"/>
+      <path d="M159 159H253M394 159V300M441 159H582M629 159V347M112 300H206M253 253V441M300 441H488"/>
+      <path d="M394 300H535M582 253V488M629 394H741M159 347V582M206 535H394M441 488H629"/>
+      <path d="M488 535V670M535 582H741M300 582V670"/>
+    </g>
+
+    <g fill="#0d0e12">
+      <rect x="78" y="32" width="26" height="26"/>
+      <rect x="267" y="32" width="26" height="26"/>
+      <rect x="549" y="32" width="26" height="26"/>
+      <rect x="220" y="267" width="26" height="26"/>
+      <rect x="502" y="314" width="26" height="26"/>
+      <rect x="643" y="502" width="26" height="26"/>
+    </g>
+
+    <g fill="#6366f1" opacity="0.52">
+      <rect x="76" y="76" width="36" height="36"/>
+      <rect x="123" y="76" width="36" height="36"/>
+      <rect x="170" y="76" width="36" height="36"/>
+      <rect x="217" y="76" width="36" height="36"/>
+      <rect x="217" y="123" width="36" height="36"/>
+      <rect x="217" y="170" width="36" height="36"/>
+      <rect x="264" y="170" width="36" height="36"/>
+      <rect x="311" y="170" width="36" height="36"/>
+      <rect x="358" y="170" width="36" height="36"/>
+      <rect x="405" y="170" width="36" height="36"/>
+    </g>
+
+    <path d="M94 94L235 94L235 188L423 188L423 329L611 329L611 517L705 517" fill="none" stroke="#f97316" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    <circle cx="94" cy="94" r="24" fill="#10b981"/>
+    <text x="94" y="101" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">S</text>
+    <circle cx="705" cy="517" r="24" fill="#ef4444"/>
+    <text x="705" y="524" text-anchor="middle" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">E</text>
+  </g>
+</svg>

@@ -1,0 +1,33 @@
+# Build outputs
+build/
+out/
+cmake-build-*/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+CTestTestfile.cmake
+Testing/
+
+# Qt Creator / IDE local files
+CMakeLists.txt.user*
+*.pro.user*
+*.autosave
+.vscode/
+.idea/
+
+# Binaries and object files
+*.exe
+*.dll
+*.lib
+*.a
+*.o
+*.obj
+*.pdb
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
