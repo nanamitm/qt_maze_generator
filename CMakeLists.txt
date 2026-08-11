@@ -36,6 +36,8 @@ qt_add_executable(QtMazeGenerator
     src/generators/HuntAndKillGenerator.h
     src/generators/HuntAndKillGenerator.cpp
     src/generators/DisjointSet.h
+    src/generators/EllerGenerator.h
+    src/generators/EllerGenerator.cpp
     src/generators/BoruvkaGenerator.h
     src/generators/BoruvkaGenerator.cpp
     src/generators/KruskalGenerator.h

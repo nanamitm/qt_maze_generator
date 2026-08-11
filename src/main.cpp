@@ -265,7 +265,7 @@ struct StatsExpectation {
     int longestPath;
 };
 
-const std::array<StatsExpectation, 10> kStatsExpectations = {{
+const std::array<StatsExpectation, 11> kStatsExpectations = {{
     {"dfs",        10.0,  9.0, 1584},
     {"huntkill",   10.0,  9.0,  471},
     {"growingtree", 15.0, 15.0,  489},
@@ -273,6 +273,7 @@ const std::array<StatsExpectation, 10> kStatsExpectations = {{
     {"prim",       32.0, 27.0,  298},
     {"kruskal",    31.0, 27.0,  436},
     {"boruvka",    28.0, 25.0,  483},
+    {"eller",      28.0, 25.0,  438},
     {"binarytree", 25.0, 25.0,  232},
     {"sidewinder", 29.0, 26.0,  241},
     // The reference lists 34% junctions for recursive division, which no
