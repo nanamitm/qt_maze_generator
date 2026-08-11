@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QFile>
 #include <QIcon>
 #include <QPainter>
 #include <QPainterPath>
@@ -108,8 +109,24 @@ QIcon createAppIcon()
     return icon;
 }
 
+bool hasSelfTestFlag(int argc, char *argv[])
+{
+    for (int i = 1; i < argc; ++i) {
+        if (qstrcmp(argv[i], "--self-test") == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int runSelfTest()
 {
+    QFile stylesheet(":/styles.qss");
+    if (!stylesheet.open(QFile::ReadOnly | QFile::Text) || stylesheet.readAll().isEmpty()) {
+        qCritical() << "Embedded stylesheet is missing or empty.";
+        return 1;
+    }
+
     const std::array<GeneratorType, 3> generators = {
         GeneratorType::DFS,
         GeneratorType::Prim,
@@ -150,14 +167,17 @@ int runSelfTest()
 
 int main(int argc, char *argv[])
 {
+    // The self-test only exercises MazeModel, so it must not require a display.
+    // Detect the flag before QApplication is constructed.
+    if (hasSelfTestFlag(argc, argv)) {
+        QCoreApplication app(argc, argv);
+        return runSelfTest();
+    }
+
     QApplication a(argc, argv);
     a.setApplicationName("Qt6 C++ Maze Generator");
     a.setApplicationVersion("1.0.0");
     a.setWindowIcon(createAppIcon());
-
-    if (QCoreApplication::arguments().contains("--self-test")) {
-        return runSelfTest();
-    }
 
     MainWindow w;
     w.setWindowIcon(a.windowIcon());
