@@ -9,7 +9,9 @@
 #include <QFile>
 #include <QDebug>
 #include <QFrame>
+#include <QRandomGenerator>
 #include <QScrollArea>
+#include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -103,6 +105,31 @@ void MainWindow::setupUI()
     connect(m_instantGenBtn, &QPushButton::clicked, this, &MainWindow::onInstantGenerateClicked);
     genButtonsLayout->addWidget(m_instantGenBtn);
     genLayout->addLayout(genButtonsLayout);
+
+    // Seed controls. The seed is always shown, so an interesting maze can be
+    // pinned and replayed, or the same seed compared across algorithms.
+    QHBoxLayout *seedLayout = new QHBoxLayout();
+    seedLayout->setSpacing(6);
+
+    m_seedSpin = new QSpinBox(genGroup);
+    m_seedSpin->setRange(1, 999999);
+    m_seedSpin->setValue(static_cast<int>(m_model->seed() % 999999) + 1);
+    m_seedSpin->setPrefix("Seed ");
+
+    m_newSeedBtn = new QPushButton("New", genGroup);
+    m_newSeedBtn->setToolTip("Pick a new random seed");
+    connect(m_newSeedBtn, &QPushButton::clicked, this, [this]() {
+        m_seedSpin->setValue(QRandomGenerator::global()->bounded(1, 1000000));
+    });
+
+    seedLayout->addWidget(m_seedSpin);
+    seedLayout->addWidget(m_newSeedBtn);
+    genLayout->addLayout(seedLayout);
+
+    m_fixedSeedCheck = new QCheckBox("Reuse this seed", genGroup);
+    m_fixedSeedCheck->setToolTip("Off: every run draws a new seed and shows it here");
+    genLayout->addWidget(m_fixedSeedCheck);
+
     sideLayout->addWidget(genGroup);
 
     // 3. Solver Settings
@@ -227,6 +254,7 @@ void MainWindow::onGenerateClicked()
     }
 
     m_timer->stop();
+    applySeed();
     m_model->initGeneration(m_genAlgoCombo->currentData().toString());
     m_timer->start();
     updateUIStates();
@@ -235,6 +263,7 @@ void MainWindow::onGenerateClicked()
 void MainWindow::onInstantGenerateClicked()
 {
     m_timer->stop();
+    applySeed();
     m_model->generateInstant(m_genAlgoCombo->currentData().toString());
     updateUIStates();
 }
@@ -316,7 +345,13 @@ void MainWindow::onTimerTick()
 {
     bool continues = false;
     if (m_model->isGenerating()) {
-        continues = m_model->stepGeneration();
+        const int steps = generationStepsPerTick();
+        for (int i = 0; i < steps; ++i) {
+            continues = m_model->stepGeneration();
+            if (!continues) {
+                break;
+            }
+        }
     } else if (m_model->isSolving()) {
         const int steps = solvingStepsPerTick();
         for (int i = 0; i < steps; ++i) {
@@ -344,7 +379,10 @@ void MainWindow::onSpeedChanged(int value)
     m_timer->setInterval(value);
 }
 
-int MainWindow::solvingStepsPerTick() const
+// A short delay means the user wants speed, but the timer cannot fire much
+// faster than every few milliseconds, so short delays do more work per tick
+// instead.
+int MainWindow::speedMultiplier() const
 {
     if (!m_speedSlider) {
         return 1;
@@ -358,6 +396,26 @@ int MainWindow::solvingStepsPerTick() const
     if (delay <= 80) return 4;
     if (delay <= 140) return 2;
     return 1;
+}
+
+int MainWindow::solvingStepsPerTick() const
+{
+    return speedMultiplier();
+}
+
+// Generators whose single step is a tiny change (random walks, for instance)
+// declare a scale so they animate at a watchable rate.
+int MainWindow::generationStepsPerTick() const
+{
+    return speedMultiplier() * std::max(1, m_model->generatorStepScale());
+}
+
+void MainWindow::applySeed()
+{
+    if (!m_fixedSeedCheck->isChecked()) {
+        m_seedSpin->setValue(QRandomGenerator::global()->bounded(1, 1000000));
+    }
+    m_model->setSeed(static_cast<quint32>(m_seedSpin->value()));
 }
 
 void MainWindow::onSizeChanged()
@@ -399,6 +457,9 @@ void MainWindow::updateUIStates()
     m_widthSpin->setEnabled(!isSimulating);
     m_heightSpin->setEnabled(!isSimulating);
     m_genAlgoCombo->setEnabled(!isSimulating);
+    m_seedSpin->setEnabled(!isSimulating);
+    m_newSeedBtn->setEnabled(!isSimulating);
+    m_fixedSeedCheck->setEnabled(!isSimulating);
     m_solveAlgoCombo->setEnabled(canSolve);
 
     // Generate becomes Cancel while an animated generation is in progress.

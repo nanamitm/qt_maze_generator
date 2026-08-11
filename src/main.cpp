@@ -29,6 +29,38 @@ int solutionCellCount(const MazeModel& model)
     return count;
 }
 
+std::vector<bool> wallSnapshot(const MazeModel& model)
+{
+    std::vector<bool> walls;
+    walls.reserve(static_cast<size_t>(model.width()) * model.height());
+    for (int y = 0; y < model.height(); ++y) {
+        for (int x = 0; x < model.width(); ++x) {
+            walls.push_back(model.cell(y, x).isWall);
+        }
+    }
+    return walls;
+}
+
+// Generating twice from one seed must produce the same maze, otherwise the
+// seed control is decorative and runs cannot be compared across algorithms.
+bool isSeedReproducible(const QString& generatorId)
+{
+    std::vector<bool> first;
+    for (int run = 0; run < 2; ++run) {
+        MazeModel model;
+        model.setSize(31, 31);
+        model.setSeed(12345);
+        model.generateInstant(generatorId);
+
+        if (run == 0) {
+            first = wallSnapshot(model);
+        } else if (wallSnapshot(model) != first) {
+            return false;
+        }
+    }
+    return true;
+}
+
 QString solverName(SolverType type)
 {
     switch (type) {
@@ -137,6 +169,11 @@ int runSelfTest()
     // touching this function.
     int combinations = 0;
     for (const GeneratorInfo& generator : generatorCatalog()) {
+        if (!isSeedReproducible(generator.id)) {
+            qCritical() << "Generator is not reproducible from its seed:" << generator.displayName;
+            return 1;
+        }
+
         for (SolverType solver : solvers) {
             MazeModel model;
             model.setSize(31, 31);

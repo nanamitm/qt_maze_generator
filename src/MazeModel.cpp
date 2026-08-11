@@ -6,8 +6,9 @@
 MazeModel::MazeModel(QObject *parent)
     : QObject(parent)
 {
-    // Seed the random generator
-    m_rng.seed(std::chrono::system_clock::now().time_since_epoch().count());
+    // Start from an arbitrary seed; the UI can pin it to make runs repeatable.
+    m_seed = static_cast<quint32>(std::chrono::system_clock::now().time_since_epoch().count());
+    m_rng.seed(m_seed);
     setSize(31, 31);
 }
 

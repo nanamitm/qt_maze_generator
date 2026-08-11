@@ -4,6 +4,11 @@
 
 // ----------------- Generation -----------------
 
+int MazeModel::generatorStepScale() const
+{
+    return m_generator ? m_generator->stepScale() : 1;
+}
+
 void MazeModel::initGeneration(const QString& generatorId)
 {
     const GeneratorInfo *info = findGenerator(generatorId);
@@ -13,6 +18,7 @@ void MazeModel::initGeneration(const QString& generatorId)
     }
 
     m_hasGeneratedMaze = false;
+    m_rng.seed(m_seed);
     m_generator = info->make(m_rng);
     m_generatorName = info->displayName;
 

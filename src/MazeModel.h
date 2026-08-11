@@ -57,6 +57,15 @@ public:
     bool isValid(const QPoint& p) const;
     bool isValid(int r, int c) const;
 
+    // Generation is reseeded from this at every run, so the same seed and the
+    // same algorithm always produce the same maze, and one seed can be used to
+    // compare algorithms against each other.
+    void setSeed(quint32 seed) { m_seed = seed; }
+    quint32 seed() const { return m_seed; }
+
+    // How many steps of the active generator are worth showing in one frame.
+    int generatorStepScale() const;
+
     // Control functions. The generator is named by its catalog id.
     void initGeneration(const QString& generatorId);
     bool stepGeneration(); // Returns true if generation is still running, false if finished
@@ -93,6 +102,7 @@ private:
 
     // Random number generator
     std::mt19937 m_rng;
+    quint32 m_seed = 0;
 
     // Helper functions
     double heuristic(const QPoint& p1, const QPoint& p2) const;

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QSlider>
@@ -37,7 +38,10 @@ private slots:
 private:
     void setupUI();
     void loadStyleSheet();
+    int speedMultiplier() const;
     int solvingStepsPerTick() const;
+    int generationStepsPerTick() const;
+    void applySeed();
 
     MazeModel *m_model = nullptr;
     MazeCanvas *m_canvas = nullptr;
@@ -47,6 +51,9 @@ private:
     QSpinBox *m_widthSpin = nullptr;
     QSpinBox *m_heightSpin = nullptr;
     QComboBox *m_genAlgoCombo = nullptr;
+    QSpinBox *m_seedSpin = nullptr;
+    QCheckBox *m_fixedSeedCheck = nullptr;
+    QPushButton *m_newSeedBtn = nullptr;
     QComboBox *m_solveAlgoCombo = nullptr;
     QSlider *m_speedSlider = nullptr;
     QLabel *m_speedValLabel = nullptr;
