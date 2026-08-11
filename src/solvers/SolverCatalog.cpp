@@ -6,6 +6,7 @@
 #include "solvers/DeadEndFillingSolver.h"
 #include "solvers/DfsSolver.h"
 #include "solvers/GreedySolver.h"
+#include "solvers/WallFollowerSolver.h"
 
 namespace {
 
@@ -28,6 +29,7 @@ const std::vector<SolverInfo>& solverCatalog()
         {QStringLiteral("astar"),  QStringLiteral("A* Search Algorithm"),        factory<AStarSolver>()},
         {QStringLiteral("greedy"), QStringLiteral("Greedy Best-First Search"),  factory<GreedySolver>()},
         {QStringLiteral("deadend"), QStringLiteral("Dead-End Filling"),          factory<DeadEndFillingSolver>()},
+        {QStringLiteral("wallfollow"), QStringLiteral("Wall Follower (right hand)"), factory<WallFollowerSolver>()},
     };
     return catalog;
 }
