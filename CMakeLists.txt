@@ -33,8 +33,11 @@ qt_add_executable(QtMazeGenerator
     src/solvers/BfsSolver.cpp
     src/solvers/DfsSolver.h
     src/solvers/DfsSolver.cpp
+    src/solvers/BestFirst.h
     src/solvers/AStarSolver.h
     src/solvers/AStarSolver.cpp
+    src/solvers/GreedySolver.h
+    src/solvers/GreedySolver.cpp
     src/generators/GeneratorCatalog.h
     src/generators/GeneratorCatalog.cpp
     src/generators/BinaryTreeGenerator.h

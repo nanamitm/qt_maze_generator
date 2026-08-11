@@ -1,13 +1,6 @@
 #include "solvers/AStarSolver.h"
 
-#include <cmath>
-
 #include "MazeGrid.h"
-
-double AStarSolver::heuristic(const QPoint& a, const QPoint& b)
-{
-    return std::abs(a.x() - b.x()) + std::abs(a.y() - b.y());
-}
 
 void AStarSolver::init(MazeGrid &grid, const QPoint &start, const QPoint &end)
 {
@@ -17,7 +10,7 @@ void AStarSolver::init(MazeGrid &grid, const QPoint &start, const QPoint &end)
     m_closed.assign(grid.height(), std::vector<bool>(grid.width(), false));
     m_gScore.assign(grid.height(), std::vector<double>(grid.width(), 1e9));
     m_gScore[start.y()][start.x()] = 0.0;
-    m_open.push(AStarNode{start, heuristic(start, end)});
+    m_open.push(BestFirstNode{start, manhattan(start, end)});
 }
 
 bool AStarSolver::step(MazeGrid &grid)
@@ -53,7 +46,7 @@ bool AStarSolver::step(MazeGrid &grid)
         m_parent[next.y()][next.x()] = curr;
         m_gScore[next.y()][next.x()] = tentativeG;
         grid[next.y()][next.x()].isFrontier = true;
-        m_open.push(AStarNode{next, tentativeG + heuristic(next, m_end)});
+        m_open.push(BestFirstNode{next, tentativeG + manhattan(next, m_end)});
     }
 
     return true;

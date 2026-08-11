@@ -41,7 +41,7 @@ nothing has to be copied alongside the binary when distributing it.
 ## Features
 
 - Thirteen maze generation algorithms (listed below)
-- BFS, DFS and A* pathfinding
+- BFS, DFS, A* and greedy best-first pathfinding
 - Animated generation, instant generation, single stepping, pause and cancel
 - Seeded generation, so a run can be repeated or one seed compared across
   algorithms
@@ -70,6 +70,19 @@ figures below are measured on an 88 x 47 grid of 4136 cells.
 | Sidewinder | 28.3% | 25.3% | 233 |
 | Binary Tree | 25.2% | 25.1% | 237 |
 | Recursive Division | 15.4% | 14.4% | 546 |
+
+## Solvers
+
+A generated maze is a spanning tree, so exactly one route joins any two cells.
+Every solver therefore returns the same path, and what separates them is how
+much of the maze they have to look at to find it. On a 31 x 31 maze from the
+recursive backtracker, reaching the same 149-cell path costs BFS 179 visited
+cells, A* 169, greedy best-first 157 and DFS 151.
+
+The differences grow on mazes with more branching: on one from Prim's
+algorithm, BFS visits 448 cells against greedy's 133. Greedy is not uniformly
+cheaper, though, since the heuristic can walk it into a dead-end region: on a
+growing-tree maze it visits 307 cells where A* needs 183.
 
 Adding an algorithm means writing one class deriving from `MazeGenerator` and
 appending one row to `src/generators/GeneratorCatalog.cpp`. The algorithm combo

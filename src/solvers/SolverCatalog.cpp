@@ -3,6 +3,7 @@
 #include "solvers/AStarSolver.h"
 #include "solvers/BfsSolver.h"
 #include "solvers/DfsSolver.h"
+#include "solvers/GreedySolver.h"
 
 namespace {
 
@@ -21,7 +22,8 @@ const std::vector<SolverInfo>& solverCatalog()
     static const std::vector<SolverInfo> catalog = {
         {QStringLiteral("bfs"),   QStringLiteral("Breadth-First Search (BFS)"), factory<BfsSolver>()},
         {QStringLiteral("dfs"),   QStringLiteral("Depth-First Search (DFS)"),   factory<DfsSolver>()},
-        {QStringLiteral("astar"), QStringLiteral("A* Search Algorithm"),        factory<AStarSolver>()},
+        {QStringLiteral("astar"),  QStringLiteral("A* Search Algorithm"),        factory<AStarSolver>()},
+        {QStringLiteral("greedy"), QStringLiteral("Greedy Best-First Search"),  factory<GreedySolver>()},
     };
     return catalog;
 }

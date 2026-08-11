@@ -6,6 +6,7 @@
 #include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
+#include <QStringList>
 
 #include <array>
 #include <cstdio>
@@ -24,6 +25,19 @@ int solutionCellCount(const MazeModel& model)
     for (int y = 0; y < model.height(); ++y) {
         for (int x = 0; x < model.width(); ++x) {
             if (model.cell(y, x).isSolution) {
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+
+int visitedCellCount(const MazeModel& model)
+{
+    int count = 0;
+    for (int y = 0; y < model.height(); ++y) {
+        for (int x = 0; x < model.width(); ++x) {
+            if (model.cell(y, x).isVisited) {
                 ++count;
             }
         }
@@ -361,9 +375,18 @@ int runSelfTest()
             return 1;
         }
 
+        // A generated maze is a spanning tree, so exactly one route joins any
+        // two cells. Every solver that finds a path must therefore report the
+        // same length, whether or not the algorithm is one that guarantees the
+        // shortest route: a solver that disagrees has a broken parent chain.
+        int expectedPathLength = 0;
+        QString expectedFrom;
+        QStringList effort;
+
         for (const SolverInfo& solver : solverCatalog()) {
             MazeModel model;
             model.setSize(31, 31);
+            model.setSeed(777);
             model.generateInstant(generator.id);
 
             if (!model.hasGeneratedMaze()) {
@@ -378,8 +401,27 @@ int runSelfTest()
                             << generator.displayName << solver.displayName;
                 return 1;
             }
+
+            if (expectedPathLength == 0) {
+                expectedPathLength = pathLength;
+                expectedFrom = solver.id;
+            } else if (pathLength != expectedPathLength) {
+                qCritical().noquote()
+                    << QString("Solvers disagree on %1: %2 found %3 cells, %4 found %5")
+                           .arg(generator.id).arg(expectedFrom).arg(expectedPathLength)
+                           .arg(solver.id).arg(pathLength);
+                return 1;
+            }
+
+            effort << QString("%1 %2").arg(solver.id).arg(visitedCellCount(model));
             ++combinations;
         }
+
+        // Search effort is what actually separates the solvers here, so it is
+        // reported rather than asserted.
+        qInfo().noquote() << QString("%1: path %2 cells, visited: %3")
+                                 .arg(generator.id).arg(expectedPathLength)
+                                 .arg(effort.join(", "));
     }
 
     qInfo() << "Self-test passed:" << combinations << "generator/solver combinations.";
