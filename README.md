@@ -116,7 +116,21 @@ headless machine.
 invoking it directly from PowerShell does not wait for it and leaves
 `$LASTEXITCODE` untouched; piping makes PowerShell wait.
 
-## CI
+## CI and releases
 
 `.github/workflows/windows-build.yml` builds the application on GitHub Actions
 for Windows and runs the self-test.
+
+Every build also packages a standalone folder with `windeployqt`, containing
+the executable, the Qt libraries and the MinGW runtime, and attaches it as a
+build artifact. Nothing else needs to be installed to run it. The workflow
+proves that by running the self-test against the packaged copy with the build
+environment removed from `PATH`, so a DLL that failed to deploy fails the build
+rather than a user's machine.
+
+Pushing a tag that starts with `v` additionally publishes a GitHub release with
+that archive attached:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
