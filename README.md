@@ -8,10 +8,14 @@ Qt6/C++ で作った迷路自動生成・探索アプリです。
 
 ```text
 .
+├── .github/
+│   └── workflows/
+│       └── windows-build.yml
 ├── CMakeLists.txt
+├── LICENSE
+├── README.md
 ├── docs/
 │   └── screenshot.svg
-├── README.md
 ├── resources/
 │   ├── app.ico
 │   ├── app-icon.png
@@ -23,9 +27,13 @@ Qt6/C++ で作った迷路自動生成・探索アプリです。
     ├── MainWindow.h
     ├── MazeCanvas.cpp
     ├── MazeCanvas.h
-    ├── MazeModel.cpp
-    └── MazeModel.h
+    ├── MazeModel.cpp          # グリッド状態と共通ヘルパー
+    ├── MazeModel.h
+    ├── MazeModelGeneration.cpp # DFS / Prim / 再帰分割
+    └── MazeModelSolving.cpp    # BFS / DFS / A*
 ```
+
+`resources/styles.qss` は Qt リソースとして実行ファイルに埋め込まれるため、配布時に別途コピーする必要はありません。
 
 ## Features
 
@@ -64,7 +72,7 @@ C:\Qt\Tools\CMake_64\bin\cmake.exe --build build --config Release
 .\build\QtMazeGenerator.exe --self-test
 ```
 
-The self-test runs all generator and solver combinations and exits with a non-zero code if any path cannot be solved.
+The self-test runs all generator and solver combinations and exits with a non-zero code if any path cannot be solved. It also checks that the embedded stylesheet resolves. No display is required, so it can run on a headless machine.
 
 ## CI
 
