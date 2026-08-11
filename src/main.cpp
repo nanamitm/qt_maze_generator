@@ -9,6 +9,7 @@
 
 #include <array>
 #include <cstdio>
+#include <deque>
 
 #include "MainWindow.h"
 #include "MazeModel.h"
@@ -68,6 +69,7 @@ bool isSeedReproducible(const QString& generatorId)
 struct MazeStats {
     int cells = 0;
     int passages = 0; // connections between neighbouring cells
+    int longestPath = 0;
     double deadEndPercent = 0.0;
     double junctionPercent = 0.0;
 
@@ -75,6 +77,55 @@ struct MazeStats {
     // passage fewer than it has cells. More passages means a loop.
     bool isPerfect() const { return passages == cells - 1; }
 };
+
+// Longest path between any two cells, i.e. the diameter of the tree, found by
+// breadth-first search twice. Dead-end and junction shares cannot tell the
+// recursive backtracker from hunt-and-kill, since both sit at 10%; this can,
+// because the backtracker's single long walk gives it a diameter several times
+// larger.
+int measureLongestPath(const MazeModel& model)
+{
+    const auto farthestFrom = [&model](const QPoint& start, int *distance) {
+        std::vector<std::vector<int>> dist(model.height(), std::vector<int>(model.width(), -1));
+        std::deque<QPoint> queue;
+        queue.push_back(start);
+        dist[start.y()][start.x()] = 0;
+
+        QPoint best = start;
+        int bestDistance = 0;
+
+        while (!queue.empty()) {
+            const QPoint curr = queue.front();
+            queue.pop_front();
+
+            if (dist[curr.y()][curr.x()] > bestDistance) {
+                bestDistance = dist[curr.y()][curr.x()];
+                best = curr;
+            }
+
+            const int dx[] = {0, 0, -1, 1};
+            const int dy[] = {-1, 1, 0, 0};
+            for (int i = 0; i < 4; ++i) {
+                const QPoint next(curr.x() + dx[i] * 2, curr.y() + dy[i] * 2);
+                if (next.x() < 1 || next.x() > model.width() - 2) continue;
+                if (next.y() < 1 || next.y() > model.height() - 2) continue;
+                if (model.cell(curr.y() + dy[i], curr.x() + dx[i]).isWall) continue;
+                if (dist[next.y()][next.x()] != -1) continue;
+                dist[next.y()][next.x()] = dist[curr.y()][curr.x()] + 1;
+                queue.push_back(next);
+            }
+        }
+
+        if (distance) *distance = bestDistance;
+        return best;
+    };
+
+    int ignored = 0;
+    const QPoint end = farthestFrom(QPoint(1, 1), &ignored);
+    int diameter = 0;
+    farthestFrom(end, &diameter);
+    return diameter + 1; // in cells, not steps
+}
 
 MazeStats measureMaze(const MazeModel& model)
 {
@@ -106,6 +157,7 @@ MazeStats measureMaze(const MazeModel& model)
         }
     }
     stats.passages /= 2; // each passage was counted from both ends
+    stats.longestPath = measureLongestPath(model);
 
     if (stats.cells > 0) {
         stats.deadEndPercent = 100.0 * deadEnds / stats.cells;
@@ -210,24 +262,31 @@ struct StatsExpectation {
     const char *id;
     double deadEndPercent;
     double junctionPercent;
+    int longestPath;
 };
 
-const std::array<StatsExpectation, 5> kStatsExpectations = {{
-    {"dfs",        10.0,  9.0},
-    {"prim",       32.0, 27.0},
-    {"binarytree", 25.0, 25.0},
-    {"sidewinder", 29.0, 26.0},
+const std::array<StatsExpectation, 6> kStatsExpectations = {{
+    {"dfs",        10.0,  9.0, 1584},
+    {"huntkill",   10.0,  9.0,  471},
+    {"prim",       32.0, 27.0,  298},
+    {"binarytree", 25.0, 25.0,  232},
+    {"sidewinder", 29.0, 26.0,  241},
     // The reference lists 34% junctions for recursive division, which no
     // perfect maze can reach: in a spanning tree junctions <= dead ends - 2,
     // and every other algorithm in that reference obeys it. Taken as a typo
     // for 14%, which is what this implementation measures.
-    {"division", 15.0, 14.0},
+    {"division",   15.0, 14.0,  378},
 }};
 
 // Single-sample references, and an algorithm's exact figures shift a little
 // with the seed, so allow a band. The algorithms sit 10+ points apart, so this
 // still separates them.
 constexpr double kStatsTolerance = 4.0;
+
+// Path length swings far more with the seed than the percentages do, so it
+// gets a proportional band. It still separates the algorithms that share a
+// dead-end share: the backtracker's 1584 against hunt-and-kill's 471.
+constexpr double kPathTolerance = 0.45;
 
 bool checkMazeStatistics()
 {
@@ -259,9 +318,13 @@ bool checkMazeStatistics()
         }
         const double deadEndError = std::abs(stats.deadEndPercent - expected->deadEndPercent);
         const double junctionError = std::abs(stats.junctionPercent - expected->junctionPercent);
-        const bool matches = deadEndError <= kStatsTolerance && junctionError <= kStatsTolerance;
+        const double pathRatio = static_cast<double>(stats.longestPath) / expected->longestPath;
+        const bool matches = deadEndError <= kStatsTolerance
+            && junctionError <= kStatsTolerance
+            && pathRatio >= 1.0 - kPathTolerance
+            && pathRatio <= 1.0 + kPathTolerance;
 
-        qInfo().noquote() << QString("%1: %2 cells, %8 passages%9, dead ends %3% (expected %4%), junctions %5% (expected %6%)%7")
+        qInfo().noquote() << QString("%1: %2 cells%9, dead ends %3% (exp %4%), junctions %5% (exp %6%), longest path %8 (exp %10)%7")
             .arg(generator.id)
             .arg(stats.cells)
             .arg(stats.deadEndPercent, 0, 'f', 1)
@@ -269,8 +332,10 @@ bool checkMazeStatistics()
             .arg(stats.junctionPercent, 0, 'f', 1)
             .arg(expected->junctionPercent, 0, 'f', 0)
             .arg(matches ? "" : "  <-- OUT OF BAND")
-            .arg(stats.passages)
-            .arg(stats.isPerfect() ? "" : QString(" (NOT PERFECT, expected %1)").arg(stats.cells - 1));
+            .arg(stats.longestPath)
+            .arg(stats.isPerfect() ? "" : QString(", NOT PERFECT (%1 passages, expected %2)")
+                 .arg(stats.passages).arg(stats.cells - 1))
+            .arg(expected->longestPath);
 
         if (!matches) {
             ok = false;

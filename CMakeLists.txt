@@ -31,6 +31,8 @@ qt_add_executable(QtMazeGenerator
     src/generators/BinaryTreeGenerator.cpp
     src/generators/DfsGenerator.h
     src/generators/DfsGenerator.cpp
+    src/generators/HuntAndKillGenerator.h
+    src/generators/HuntAndKillGenerator.cpp
     src/generators/PrimGenerator.h
     src/generators/PrimGenerator.cpp
     src/generators/DivisionGenerator.h
