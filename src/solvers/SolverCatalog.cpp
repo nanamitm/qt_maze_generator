@@ -3,6 +3,7 @@
 #include "solvers/AStarSolver.h"
 #include "solvers/BfsSolver.h"
 #include "solvers/BidirectionalBfsSolver.h"
+#include "solvers/DeadEndFillingSolver.h"
 #include "solvers/DfsSolver.h"
 #include "solvers/GreedySolver.h"
 
@@ -26,6 +27,7 @@ const std::vector<SolverInfo>& solverCatalog()
         {QStringLiteral("dfs"),   QStringLiteral("Depth-First Search (DFS)"),   factory<DfsSolver>()},
         {QStringLiteral("astar"),  QStringLiteral("A* Search Algorithm"),        factory<AStarSolver>()},
         {QStringLiteral("greedy"), QStringLiteral("Greedy Best-First Search"),  factory<GreedySolver>()},
+        {QStringLiteral("deadend"), QStringLiteral("Dead-End Filling"),          factory<DeadEndFillingSolver>()},
     };
     return catalog;
 }

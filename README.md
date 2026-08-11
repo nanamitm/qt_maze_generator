@@ -41,7 +41,8 @@ nothing has to be copied alongside the binary when distributing it.
 ## Features
 
 - Thirteen maze generation algorithms (listed below)
-- BFS, DFS, A* and greedy best-first pathfinding
+- Six pathfinders: BFS, bidirectional BFS, DFS, A*, greedy best-first and
+  dead-end filling
 - Animated generation, instant generation, single stepping, pause and cancel
 - Seeded generation, so a run can be repeated or one seed compared across
   algorithms
@@ -80,9 +81,17 @@ recursive backtracker, reaching the same 149-cell path costs BFS 179 visited
 cells, A* 169, greedy best-first 157 and DFS 151.
 
 The differences grow on mazes with more branching: on one from Prim's
-algorithm, BFS visits 448 cells against greedy's 133. Greedy is not uniformly
-cheaper, though, since the heuristic can walk it into a dead-end region: on a
-growing-tree maze it visits 307 cells where A* needs 183.
+algorithm, BFS visits 448 cells against greedy's 133 and bidirectional BFS's
+213. Greedy is not uniformly cheaper, though, since the heuristic can walk it
+into a dead-end region: on a growing-tree maze it visits 307 cells where A*
+needs 183. Bidirectional BFS has the opposite weakness, and loses to plain BFS
+on the recursive backtracker's long single corridor, where there is little
+breadth for halving the depth to save.
+
+Dead-end filling is the odd one out: it never searches for the route at all,
+it plugs every dead end until only the route is left, so its count is of cells
+eliminated rather than cells searched, and it always adds up to every open cell
+that is not on the path.
 
 Adding an algorithm means writing one class deriving from `MazeGenerator` and
 appending one row to `src/generators/GeneratorCatalog.cpp`. The algorithm combo
