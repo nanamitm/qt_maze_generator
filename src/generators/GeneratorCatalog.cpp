@@ -1,6 +1,7 @@
 #include "generators/GeneratorCatalog.h"
 
 #include "generators/BinaryTreeGenerator.h"
+#include "generators/AldousBroderGenerator.h"
 #include "generators/BoruvkaGenerator.h"
 #include "generators/DfsGenerator.h"
 #include "generators/DivisionGenerator.h"
@@ -10,6 +11,7 @@
 #include "generators/KruskalGenerator.h"
 #include "generators/PrimGenerator.h"
 #include "generators/SidewinderGenerator.h"
+#include "generators/WilsonGenerator.h"
 
 namespace {
 
@@ -41,6 +43,8 @@ const std::vector<GeneratorInfo>& generatorCatalog()
         {QStringLiteral("kruskal"),  QStringLiteral("Kruskal's Algorithm"),         factory<KruskalGenerator>()},
         {QStringLiteral("boruvka"),  QStringLiteral("Boruvka's Algorithm"),         factory<BoruvkaGenerator>()},
         {QStringLiteral("eller"),    QStringLiteral("Eller's Algorithm"),           factory<EllerGenerator>()},
+        {QStringLiteral("wilson"),   QStringLiteral("Wilson (Loop-Erased Walk)"),   factory<WilsonGenerator>()},
+        {QStringLiteral("aldousbroder"), QStringLiteral("Aldous-Broder (Random Walk)"), factory<AldousBroderGenerator>()},
         {QStringLiteral("division"), QStringLiteral("Recursive Division"),          factory<DivisionGenerator>()},
         {QStringLiteral("binarytree"), QStringLiteral("Binary Tree"),               factory<BinaryTreeGenerator>()},
         {QStringLiteral("sidewinder"), QStringLiteral("Sidewinder"),                factory<SidewinderGenerator>()},

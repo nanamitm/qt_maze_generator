@@ -35,6 +35,10 @@ qt_add_executable(QtMazeGenerator
     src/generators/GrowingTreeGenerator.cpp
     src/generators/HuntAndKillGenerator.h
     src/generators/HuntAndKillGenerator.cpp
+    src/generators/AldousBroderGenerator.h
+    src/generators/AldousBroderGenerator.cpp
+    src/generators/WilsonGenerator.h
+    src/generators/WilsonGenerator.cpp
     src/generators/DisjointSet.h
     src/generators/EllerGenerator.h
     src/generators/EllerGenerator.cpp
