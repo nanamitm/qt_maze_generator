@@ -34,9 +34,8 @@ jobs:
           arch: win64_mingw
           tools: 'tools_mingw1310'
 
-      - name: Install Ninja
-        uses: seanmiddleditch/gha-setup-ninja@v5
-
+      # Ninja ships with the Windows runner image, so no action is needed to
+      # install it. The one that used to do so still targets Node.js 20.
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
@@ -83,7 +82,7 @@ jobs:
           "ARCHIVE=$name.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: QtMazeGenerator-windows-x64
           path: ${{ env.ARCHIVE }}
