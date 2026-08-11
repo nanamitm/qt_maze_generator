@@ -1,6 +1,6 @@
 # Qt Maze Generator
 
-Qt6/C++ で作った迷路自動生成・探索アプリです。
+A maze generation and pathfinding visualiser built with Qt6 and C++.
 
 ![Qt Maze Generator screenshot](docs/screenshot.svg)
 
@@ -27,31 +27,35 @@ Qt6/C++ で作った迷路自動生成・探索アプリです。
     ├── MainWindow.h
     ├── MazeCanvas.cpp
     ├── MazeCanvas.h
-    ├── MazeGrid.h / .cpp       # グリッド実体と掘削ヘルパー
-    ├── MazeGenerator.h         # 生成器インターフェース
-    ├── MazeModel.cpp / .h      # 状態管理とシグナル
-    ├── MazeModelGeneration.cpp # 生成の駆動
+    ├── MazeGrid.h / .cpp       # the grid itself, and the carving helpers
+    ├── MazeGenerator.h         # generator interface
+    ├── MazeModel.cpp / .h      # state and signals
+    ├── MazeModelGeneration.cpp # drives generation
     ├── MazeModelSolving.cpp    # BFS / DFS / A*
-    └── generators/             # アルゴリズム13種 + カタログ
+    └── generators/             # the thirteen algorithms, and the catalog
 ```
 
-`resources/styles.qss` は Qt リソースとして実行ファイルに埋め込まれるため、配布時に別途コピーする必要はありません。
+`resources/styles.qss` is compiled into the executable as a Qt resource, so
+nothing has to be copied alongside the binary when distributing it.
 
 ## Features
 
-- 13種の迷路生成アルゴリズム（下記）
-- BFS, DFS, A* による経路探索
-- アニメーション生成、即時生成、ステップ実行、一時停止、キャンセル
-- シード指定による再現可能な生成（同じシードでアルゴリズムを比較可能）
-- マウス操作による壁の追加・削除、スタート/ゴール位置の移動
-- ダークテーマのカスタム描画キャンバス
-- Windows exe アイコン対応
+- Thirteen maze generation algorithms (listed below)
+- BFS, DFS and A* pathfinding
+- Animated generation, instant generation, single stepping, pause and cancel
+- Seeded generation, so a run can be repeated or one seed compared across
+  algorithms
+- Drawing and erasing walls with the mouse, and dragging the start and goal
+- Custom-drawn dark canvas
+- Windows executable icon
 
 ## Generators
 
-同じシードで全種を見比べられます。袋小路率・分岐点率・最長経路は 88×47 = 4136 マスでの実測値です。
+Every algorithm produces a perfect maze: all cells connected, with no loops.
+What differs is how it gets there and what the result feels like to walk. The
+figures below are measured on an 88 x 47 grid of 4136 cells.
 
-| アルゴリズム | 袋小路 | 分岐点 | 最長経路 |
+| Algorithm | Dead ends | Junctions | Longest path |
 |---|---|---|---|
 | Recursive Backtracker (DFS) | 10.5% | 10.3% | 1494 |
 | Hunt-and-Kill | 9.6% | 9.4% | 604 |
@@ -67,7 +71,9 @@ Qt6/C++ で作った迷路自動生成・探索アプリです。
 | Binary Tree | 25.2% | 25.1% | 237 |
 | Recursive Division | 15.4% | 14.4% | 546 |
 
-アルゴリズムの追加は `MazeGenerator` を継承したクラス1つと、`src/generators/GeneratorCatalog.cpp` への1行で完結します。UI と self-test はカタログを読むため改修不要です。
+Adding an algorithm means writing one class deriving from `MazeGenerator` and
+appending one row to `src/generators/GeneratorCatalog.cpp`. The algorithm combo
+box and the self-test both read the catalog, so neither needs to be touched.
 
 ## Requirements
 
@@ -83,7 +89,7 @@ C:\Qt\Tools\CMake_64\bin\cmake.exe -S . -B build -G Ninja -DCMAKE_PREFIX_PATH=C:
 C:\Qt\Tools\CMake_64\bin\cmake.exe --build build --config Release
 ```
 
-`build/` は生成物なので Git 管理から除外しています。
+`build/` holds generated output and is excluded from version control.
 
 ## Run
 
@@ -98,10 +104,19 @@ C:\Qt\Tools\CMake_64\bin\cmake.exe --build build --config Release
 if ($LASTEXITCODE -ne 0) { "self-test failed" }
 ```
 
-The self-test runs all generator and solver combinations and exits with a non-zero code if any path cannot be solved. It also checks that the embedded stylesheet resolves. No display is required, so it can run on a headless machine.
+The self-test runs every generator and solver combination and exits with a
+non-zero code if any maze cannot be solved. It also checks that each generator
+is reproducible from its seed, that every maze is a spanning tree, and that
+each algorithm's share of dead ends and junctions and its longest path land in
+the expected band, which is what distinguishes a correct implementation from
+one that merely produces a connected maze. It needs no display, so it runs on a
+headless machine.
 
-`| Out-Host` は必須です。実行ファイルは GUI サブシステムでリンクされているため、PowerShell から直接呼ぶと終了を待たず `$LASTEXITCODE` も更新されません（パイプすると待機します）。
+`| Out-Host` is required. The executable is linked into the GUI subsystem, so
+invoking it directly from PowerShell does not wait for it and leaves
+`$LASTEXITCODE` untouched; piping makes PowerShell wait.
 
 ## CI
 
-`.github/workflows/windows-build.yml` builds the application on GitHub Actions for Windows and runs the self-test.
+`.github/workflows/windows-build.yml` builds the application on GitHub Actions
+for Windows and runs the self-test.
