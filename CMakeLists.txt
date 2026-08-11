@@ -28,10 +28,11 @@ if(WIN32)
     target_sources(QtMazeGenerator PRIVATE resources/app.rc)
 endif()
 
-add_custom_command(TARGET QtMazeGenerator POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${CMAKE_CURRENT_SOURCE_DIR}/resources/styles.qss
-        $<TARGET_FILE_DIR:QtMazeGenerator>/styles.qss
+# Embed the stylesheet so the app never depends on a file next to the binary.
+qt_add_resources(QtMazeGenerator "styles"
+    PREFIX "/"
+    BASE "resources"
+    FILES resources/styles.qss
 )
 
 target_link_libraries(QtMazeGenerator PRIVATE

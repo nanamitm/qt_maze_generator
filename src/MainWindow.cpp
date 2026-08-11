@@ -6,8 +6,7 @@
 #include <QSplitter>
 #include <QGridLayout>
 #include <QFile>
-#include <QDir>
-#include <QCoreApplication>
+#include <QDebug>
 #include <QFrame>
 #include <QScrollArea>
 
@@ -207,25 +206,14 @@ void MainWindow::setupUI()
 
 void MainWindow::loadStyleSheet()
 {
-    // Search stylesheet in local path or target build folder path
-    QStringList paths = {
-        QCoreApplication::applicationDirPath() + "/styles.qss",
-        QCoreApplication::applicationDirPath() + "/resources/styles.qss",
-        QDir::currentPath() + "/styles.qss",
-        QDir::currentPath() + "/resources/styles.qss",
-        QDir::currentPath() + "/qt_maze_generator/styles.qss",
-        QDir::currentPath() + "/qt_maze_generator/resources/styles.qss",
-        "../styles.qss"
-    };
-
-    for (const auto& path : paths) {
-        QFile file(path);
-        if (file.open(QFile::ReadOnly | QFile::Text)) {
-            QString styleSheet = QLatin1String(file.readAll());
-            setStyleSheet(styleSheet);
-            break;
-        }
+    // The stylesheet is compiled into the binary, so this cannot depend on the
+    // working directory or on a file being copied next to the executable.
+    QFile file(":/styles.qss");
+    if (!file.open(QFile::ReadOnly | QFile::Text)) {
+        qWarning() << "Failed to load embedded stylesheet:" << file.errorString();
+        return;
     }
+    setStyleSheet(QLatin1String(file.readAll()));
 }
 
 void MainWindow::onGenerateClicked()
