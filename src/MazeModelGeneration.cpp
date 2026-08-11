@@ -22,10 +22,15 @@ void MazeModel::initGeneration(const QString& generatorId)
     m_generator = info->make(m_rng);
     m_generatorName = info->displayName;
 
-    // The generator owns the starting grid state: some fill it with walls and
-    // carve outwards, others start from an open room and add walls.
+    // The generator owns the grid completely from here until it finishes: some
+    // fill it with walls and carve outwards, others start from an open room and
+    // add walls. Nothing may carve behind its back. Pre-carving the endpoints
+    // here used to break the algorithms that read the grid as their own visited
+    // set: Wilson would treat the pre-carved end cell as part of the maze and
+    // close a loop through it, and Aldous-Broder would wait forever for a cell
+    // that was already open to be discovered. The endpoints are joined by
+    // ensureEndReachable() once generation is done.
     m_generator->init(m_grid);
-    ensureEndpointConnections();
 
     m_generating = true;
     m_solving = false;
