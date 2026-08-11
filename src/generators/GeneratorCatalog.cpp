@@ -1,6 +1,7 @@
 #include "generators/GeneratorCatalog.h"
 
 #include "generators/BinaryTreeGenerator.h"
+#include "generators/BoruvkaGenerator.h"
 #include "generators/DfsGenerator.h"
 #include "generators/DivisionGenerator.h"
 #include "generators/GrowingTreeGenerator.h"
@@ -37,6 +38,7 @@ const std::vector<GeneratorInfo>& generatorCatalog()
         {QStringLiteral("huntkill"), QStringLiteral("Hunt-and-Kill"),             factory<HuntAndKillGenerator>()},
         {QStringLiteral("prim"),     QStringLiteral("Prim's Algorithm"),            factory<PrimGenerator>()},
         {QStringLiteral("kruskal"),  QStringLiteral("Kruskal's Algorithm"),         factory<KruskalGenerator>()},
+        {QStringLiteral("boruvka"),  QStringLiteral("Boruvka's Algorithm"),         factory<BoruvkaGenerator>()},
         {QStringLiteral("division"), QStringLiteral("Recursive Division"),          factory<DivisionGenerator>()},
         {QStringLiteral("binarytree"), QStringLiteral("Binary Tree"),               factory<BinaryTreeGenerator>()},
         {QStringLiteral("sidewinder"), QStringLiteral("Sidewinder"),                factory<SidewinderGenerator>()},
