@@ -36,6 +36,12 @@ protected:
     // algorithm's signal that the search is done.
     bool visit(MazeGrid &grid, const QPoint &cell);
 
+    // Paints the chain of cells reachable from `from` by following `parents`,
+    // and returns how many it painted. Solvers that build their path some
+    // other way use these two directly instead of visit().
+    int paintChain(MazeGrid &grid, const std::vector<std::vector<QPoint>> &parents, const QPoint &from);
+    void setPathLength(int length) { m_pathLength = length; }
+
     QPoint m_start{-1, -1};
     QPoint m_end{-1, -1};
     std::vector<std::vector<QPoint>> m_parent;

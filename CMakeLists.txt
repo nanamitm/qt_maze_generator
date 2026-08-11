@@ -31,6 +31,8 @@ qt_add_executable(QtMazeGenerator
     src/solvers/SolverCatalog.cpp
     src/solvers/BfsSolver.h
     src/solvers/BfsSolver.cpp
+    src/solvers/BidirectionalBfsSolver.h
+    src/solvers/BidirectionalBfsSolver.cpp
     src/solvers/DfsSolver.h
     src/solvers/DfsSolver.cpp
     src/solvers/BestFirst.h

@@ -21,13 +21,18 @@ bool MazeSolver::visit(MazeGrid &grid, const QPoint &cell)
         return false;
     }
 
+    m_pathLength = paintChain(grid, m_parent, m_end);
+    return true;
+}
+
+int MazeSolver::paintChain(MazeGrid &grid, const std::vector<std::vector<QPoint>> &parents, const QPoint &from)
+{
     int length = 0;
-    QPoint p = m_end;
+    QPoint p = from;
     while (p != QPoint(-1, -1)) {
         grid[p.y()][p.x()].isSolution = true;
-        p = m_parent[p.y()][p.x()];
+        p = parents[p.y()][p.x()];
         ++length;
     }
-    m_pathLength = length;
-    return true;
+    return length;
 }
