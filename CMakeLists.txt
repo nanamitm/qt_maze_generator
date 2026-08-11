@@ -35,6 +35,9 @@ qt_add_executable(QtMazeGenerator
     src/generators/GrowingTreeGenerator.cpp
     src/generators/HuntAndKillGenerator.h
     src/generators/HuntAndKillGenerator.cpp
+    src/generators/DisjointSet.h
+    src/generators/KruskalGenerator.h
+    src/generators/KruskalGenerator.cpp
     src/generators/PrimGenerator.h
     src/generators/PrimGenerator.cpp
     src/generators/DivisionGenerator.h

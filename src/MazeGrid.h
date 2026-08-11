@@ -28,6 +28,14 @@ public:
     bool isValid(int row, int col) const;
     bool isValid(const QPoint& p) const;
 
+    // Cell-space view of the grid, for algorithms that need to number the
+    // cells rather than walk them: cells sit on odd coordinates, so a
+    // 31-wide grid holds 15 of them.
+    int cellsWide() const { return (m_width - 1) / 2; }
+    int cellsHigh() const { return (m_height - 1) / 2; }
+    int cellCount() const { return cellsWide() * cellsHigh(); }
+    int cellIndex(const QPoint& p) const { return ((p.y() - 1) / 2) * cellsWide() + (p.x() - 1) / 2; }
+
     bool isWall(const QPoint& p) const { return m_cells[p.y()][p.x()].isWall; }
     void carve(const QPoint& p) { m_cells[p.y()][p.x()].isWall = false; }
 
