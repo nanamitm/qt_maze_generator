@@ -61,6 +61,59 @@ bool isSeedReproducible(const QString& generatorId)
     return true;
 }
 
+// Fingerprint of a finished maze. "Every cell is connected" is true of every
+// algorithm here, so it cannot tell a correct implementation from a subtly
+// wrong one. The share of dead ends and junctions can: it differs by a factor
+// of three or more between algorithms, and each one lands in its own band.
+struct MazeStats {
+    int cells = 0;
+    int passages = 0; // connections between neighbouring cells
+    double deadEndPercent = 0.0;
+    double junctionPercent = 0.0;
+
+    // A perfect maze is a spanning tree: connected, and with exactly one
+    // passage fewer than it has cells. More passages means a loop.
+    bool isPerfect() const { return passages == cells - 1; }
+};
+
+MazeStats measureMaze(const MazeModel& model)
+{
+    MazeStats stats;
+    int deadEnds = 0;
+    int junctions = 0;
+
+    // Cells live on odd coordinates; the even coordinate between two of them is
+    // the wall that may join them.
+    for (int y = 1; y < model.height() - 1; y += 2) {
+        for (int x = 1; x < model.width() - 1; x += 2) {
+            if (model.cell(y, x).isWall) continue;
+            ++stats.cells;
+
+            const int dx[] = {0, 0, -1, 1};
+            const int dy[] = {-1, 1, 0, 0};
+            int degree = 0;
+            for (int i = 0; i < 4; ++i) {
+                const int nx = x + dx[i] * 2;
+                const int ny = y + dy[i] * 2;
+                if (nx < 1 || nx > model.width() - 2) continue;
+                if (ny < 1 || ny > model.height() - 2) continue;
+                if (!model.cell(y + dy[i], x + dx[i]).isWall) ++degree;
+            }
+
+            if (degree == 1) ++deadEnds;
+            if (degree >= 3) ++junctions;
+            stats.passages += degree;
+        }
+    }
+    stats.passages /= 2; // each passage was counted from both ends
+
+    if (stats.cells > 0) {
+        stats.deadEndPercent = 100.0 * deadEnds / stats.cells;
+        stats.junctionPercent = 100.0 * junctions / stats.cells;
+    }
+    return stats;
+}
+
 QString solverName(SolverType type)
 {
     switch (type) {
@@ -151,6 +204,80 @@ bool hasSelfTestFlag(int argc, char *argv[])
     return false;
 }
 
+// Reference fingerprints, measured on the same 88x47 = 4136 cell maze the
+// reference visualisation used, so the numbers are directly comparable.
+struct StatsExpectation {
+    const char *id;
+    double deadEndPercent;
+    double junctionPercent;
+};
+
+const std::array<StatsExpectation, 3> kStatsExpectations = {{
+    {"dfs",      10.0,  9.0},
+    {"prim",     32.0, 27.0},
+    // The reference lists 34% junctions for recursive division, which no
+    // perfect maze can reach: in a spanning tree junctions <= dead ends - 2,
+    // and every other algorithm in that reference obeys it. Taken as a typo
+    // for 14%, which is what this implementation measures.
+    {"division", 15.0, 14.0},
+}};
+
+// Single-sample references, and an algorithm's exact figures shift a little
+// with the seed, so allow a band. The algorithms sit 10+ points apart, so this
+// still separates them.
+constexpr double kStatsTolerance = 4.0;
+
+bool checkMazeStatistics()
+{
+    bool ok = true;
+
+    for (const GeneratorInfo& generator : generatorCatalog()) {
+        const StatsExpectation *expected = nullptr;
+        for (const StatsExpectation& candidate : kStatsExpectations) {
+            if (generator.id == QLatin1String(candidate.id)) {
+                expected = &candidate;
+                break;
+            }
+        }
+
+        if (!expected) {
+            qCritical() << "No expected statistics registered for generator:" << generator.id;
+            ok = false;
+            continue;
+        }
+
+        MazeModel model;
+        model.setSize(177, 95); // 88 x 47 cells
+        model.setSeed(20260806);
+        model.generateInstant(generator.id);
+
+        const MazeStats stats = measureMaze(model);
+        if (!stats.isPerfect()) {
+            ok = false;
+        }
+        const double deadEndError = std::abs(stats.deadEndPercent - expected->deadEndPercent);
+        const double junctionError = std::abs(stats.junctionPercent - expected->junctionPercent);
+        const bool matches = deadEndError <= kStatsTolerance && junctionError <= kStatsTolerance;
+
+        qInfo().noquote() << QString("%1: %2 cells, %8 passages%9, dead ends %3% (expected %4%), junctions %5% (expected %6%)%7")
+            .arg(generator.id)
+            .arg(stats.cells)
+            .arg(stats.deadEndPercent, 0, 'f', 1)
+            .arg(expected->deadEndPercent, 0, 'f', 0)
+            .arg(stats.junctionPercent, 0, 'f', 1)
+            .arg(expected->junctionPercent, 0, 'f', 0)
+            .arg(matches ? "" : "  <-- OUT OF BAND")
+            .arg(stats.passages)
+            .arg(stats.isPerfect() ? "" : QString(" (NOT PERFECT, expected %1)").arg(stats.cells - 1));
+
+        if (!matches) {
+            ok = false;
+        }
+    }
+
+    return ok;
+}
+
 int runSelfTest()
 {
     QFile stylesheet(":/styles.qss");
@@ -164,6 +291,10 @@ int runSelfTest()
         SolverType::DFS,
         SolverType::AStar,
     };
+
+    if (!checkMazeStatistics()) {
+        return 1;
+    }
 
     // Driven by the catalog, so a newly added generator is covered without
     // touching this function.
