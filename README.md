@@ -41,8 +41,8 @@ nothing has to be copied alongside the binary when distributing it.
 ## Features
 
 - Thirteen maze generation algorithms (listed below)
-- Six pathfinders: BFS, bidirectional BFS, DFS, A*, greedy best-first and
-  dead-end filling
+- Eight pathfinders: BFS, bidirectional BFS, DFS, A*, greedy best-first,
+  dead-end filling, wall follower and Tremaux's algorithm
 - Animated generation, instant generation, single stepping, pause and cancel
 - Seeded generation, so a run can be repeated or one seed compared across
   algorithms
@@ -92,6 +92,18 @@ Dead-end filling is the odd one out: it never searches for the route at all,
 it plugs every dead end until only the route is left, so its count is of cells
 eliminated rather than cells searched, and it always adds up to every open cell
 that is not on the path.
+
+The wall follower and Tremaux's algorithm are different again, in that neither
+needs to see the maze: they decide where to go next from what is under their
+feet. That is enough in a generated maze, because a perfect maze has exactly
+one connected wall, so the wall follower's hand cannot come off it and it
+always arrives.
+
+Erase a few walls with the mouse, though, and the difference between the two
+shows up. An enclosed wall becomes an island, and a hand on it goes round
+forever. Tremaux's marks do not care: on a maze braided with 40 extra
+passages, it still gets through in 105 cells against the shortest route's 73,
+where the wall follower gives up. The self-test builds exactly that maze.
 
 Adding an algorithm means writing one class deriving from `MazeGenerator` and
 appending one row to `src/generators/GeneratorCatalog.cpp`. The algorithm combo

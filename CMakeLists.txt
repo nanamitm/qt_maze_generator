@@ -46,6 +46,8 @@ qt_add_executable(QtMazeGenerator
     src/solvers/WalkPath.cpp
     src/solvers/WallFollowerSolver.h
     src/solvers/WallFollowerSolver.cpp
+    src/solvers/TremauxSolver.h
+    src/solvers/TremauxSolver.cpp
     src/generators/GeneratorCatalog.h
     src/generators/GeneratorCatalog.cpp
     src/generators/BinaryTreeGenerator.h

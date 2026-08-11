@@ -354,6 +354,85 @@ bool checkMazeStatistics()
     return ok;
 }
 
+// Opens extra walls to braid the maze, turning the spanning tree into a graph
+// with loops. Every generated maze is a tree, so without this nothing here
+// ever exercises the case the walking solvers actually differ on.
+int braidMaze(MazeModel& model)
+{
+    int opened = 0;
+    int candidate = 0;
+
+    for (int y = 1; y <= model.height() - 2; ++y) {
+        for (int x = 1; x <= model.width() - 2; ++x) {
+            // A wall between two cells has exactly one odd coordinate.
+            const bool betweenCells = (x % 2 == 0) != (y % 2 == 0);
+            if (!betweenCells || !model.cell(y, x).isWall) {
+                continue;
+            }
+
+            const int dx = (x % 2 == 0) ? 1 : 0;
+            const int dy = (y % 2 == 0) ? 1 : 0;
+            if (model.cell(y - dy, x - dx).isWall || model.cell(y + dy, x + dx).isWall) {
+                continue;
+            }
+
+            if (candidate++ % 5 != 0) {
+                continue;
+            }
+            model.setWall(y, x, false);
+            ++opened;
+        }
+    }
+    return opened;
+}
+
+// A maze with loops is where the walking solvers part company: Tremaux is
+// guaranteed to get through one, the wall follower is not.
+bool checkBraidedMaze()
+{
+    MazeModel model;
+    model.setSize(31, 31);
+    model.setSeed(4242);
+    model.generateInstant(QStringLiteral("dfs"));
+
+    const int opened = braidMaze(model);
+    const MazeStats stats = measureMaze(model);
+    if (opened == 0 || stats.isPerfect()) {
+        qCritical() << "Braiding did not add any loops:" << opened << "walls opened";
+        return false;
+    }
+
+    model.solveInstant(QStringLiteral("bfs"));
+    const int shortest = solutionCellCount(model);
+
+    model.solveInstant(QStringLiteral("tremaux"));
+    const int tremaux = solutionCellCount(model);
+
+    model.solveInstant(QStringLiteral("wallfollow"));
+    const int wallFollower = solutionCellCount(model);
+
+    if (shortest <= 0) {
+        qCritical() << "BFS found no path in the braided maze.";
+        return false;
+    }
+    if (tremaux < shortest) {
+        qCritical() << "Tremaux reported a path shorter than the shortest one:"
+                    << tremaux << "against" << shortest;
+        return false;
+    }
+    if (tremaux == 0) {
+        qCritical() << "Tremaux failed on a braided maze, which it must not.";
+        return false;
+    }
+
+    qInfo().noquote() << QString("braided (%1 extra passages): bfs %2 cells, tremaux %3, "
+                                 "wall follower %4")
+                             .arg(opened).arg(shortest).arg(tremaux)
+                             .arg(wallFollower > 0 ? QString::number(wallFollower)
+                                                   : QStringLiteral("gave up"));
+    return true;
+}
+
 int runSelfTest()
 {
     QFile stylesheet(":/styles.qss");
@@ -363,6 +442,10 @@ int runSelfTest()
     }
 
     if (!checkMazeStatistics()) {
+        return 1;
+    }
+
+    if (!checkBraidedMaze()) {
         return 1;
     }
 
