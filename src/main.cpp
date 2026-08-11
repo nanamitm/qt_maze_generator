@@ -12,6 +12,7 @@
 
 #include "MainWindow.h"
 #include "MazeModel.h"
+#include "generators/GeneratorCatalog.h"
 
 namespace {
 
@@ -26,19 +27,6 @@ int solutionCellCount(const MazeModel& model)
         }
     }
     return count;
-}
-
-QString generatorName(GeneratorType type)
-{
-    switch (type) {
-    case GeneratorType::DFS:
-        return "DFS";
-    case GeneratorType::Prim:
-        return "Prim";
-    case GeneratorType::Division:
-        return "Division";
-    }
-    return "Unknown";
 }
 
 QString solverName(SolverType type)
@@ -139,25 +127,23 @@ int runSelfTest()
         return 1;
     }
 
-    const std::array<GeneratorType, 3> generators = {
-        GeneratorType::DFS,
-        GeneratorType::Prim,
-        GeneratorType::Division,
-    };
     const std::array<SolverType, 3> solvers = {
         SolverType::BFS,
         SolverType::DFS,
         SolverType::AStar,
     };
 
-    for (GeneratorType generator : generators) {
+    // Driven by the catalog, so a newly added generator is covered without
+    // touching this function.
+    int combinations = 0;
+    for (const GeneratorInfo& generator : generatorCatalog()) {
         for (SolverType solver : solvers) {
             MazeModel model;
             model.setSize(31, 31);
-            model.generateInstant(generator);
+            model.generateInstant(generator.id);
 
             if (!model.hasGeneratedMaze()) {
-                qCritical() << "Generation did not finish:" << generatorName(generator);
+                qCritical() << "Generation did not finish:" << generator.displayName;
                 return 1;
             }
 
@@ -165,13 +151,14 @@ int runSelfTest()
             const int pathLength = solutionCellCount(model);
             if (pathLength <= 0) {
                 qCritical() << "Solver did not find a path:"
-                            << generatorName(generator) << solverName(solver);
+                            << generator.displayName << solverName(solver);
                 return 1;
             }
+            ++combinations;
         }
     }
 
-    qInfo() << "Self-test passed.";
+    qInfo() << "Self-test passed:" << combinations << "generator/solver combinations.";
     return 0;
 }
 

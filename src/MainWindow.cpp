@@ -1,4 +1,5 @@
 #include "MainWindow.h"
+#include "generators/GeneratorCatalog.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -85,9 +86,9 @@ void MainWindow::setupUI()
     genLayout->setSpacing(6);
 
     m_genAlgoCombo = new QComboBox(genGroup);
-    m_genAlgoCombo->addItem("DFS (Backtracker)", static_cast<int>(GeneratorType::DFS));
-    m_genAlgoCombo->addItem("Prim's Algorithm", static_cast<int>(GeneratorType::Prim));
-    m_genAlgoCombo->addItem("Recursive Division", static_cast<int>(GeneratorType::Division));
+    for (const GeneratorInfo& info : generatorCatalog()) {
+        m_genAlgoCombo->addItem(info.displayName, info.id);
+    }
     genLayout->addWidget(m_genAlgoCombo);
 
     QHBoxLayout *genButtonsLayout = new QHBoxLayout();
@@ -226,8 +227,7 @@ void MainWindow::onGenerateClicked()
     }
 
     m_timer->stop();
-    GeneratorType genType = static_cast<GeneratorType>(m_genAlgoCombo->currentData().toInt());
-    m_model->initGeneration(genType);
+    m_model->initGeneration(m_genAlgoCombo->currentData().toString());
     m_timer->start();
     updateUIStates();
 }
@@ -235,8 +235,7 @@ void MainWindow::onGenerateClicked()
 void MainWindow::onInstantGenerateClicked()
 {
     m_timer->stop();
-    GeneratorType genType = static_cast<GeneratorType>(m_genAlgoCombo->currentData().toInt());
-    m_model->generateInstant(genType);
+    m_model->generateInstant(m_genAlgoCombo->currentData().toString());
     updateUIStates();
 }
 

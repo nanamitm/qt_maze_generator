@@ -25,6 +25,8 @@ qt_add_executable(QtMazeGenerator
     src/MazeModel.cpp
     src/MazeModelGeneration.cpp
     src/MazeModelSolving.cpp
+    src/generators/GeneratorCatalog.h
+    src/generators/GeneratorCatalog.cpp
     src/generators/DfsGenerator.h
     src/generators/DfsGenerator.cpp
     src/generators/PrimGenerator.h

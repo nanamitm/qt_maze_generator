@@ -1,40 +1,20 @@
 #include "MazeModel.h"
 
-#include "generators/DfsGenerator.h"
-#include "generators/DivisionGenerator.h"
-#include "generators/PrimGenerator.h"
-
-namespace {
-
-struct GeneratorEntry {
-    std::unique_ptr<MazeGenerator> generator;
-    QString name;
-};
-
-GeneratorEntry makeGenerator(GeneratorType type, std::mt19937 &rng)
-{
-    switch (type) {
-    case GeneratorType::DFS:
-        return {std::make_unique<DfsGenerator>(rng), QStringLiteral("DFS")};
-    case GeneratorType::Prim:
-        return {std::make_unique<PrimGenerator>(rng), QStringLiteral("Prim's")};
-    case GeneratorType::Division:
-        return {std::make_unique<DivisionGenerator>(rng), QStringLiteral("Recursive Division")};
-    }
-    return {std::make_unique<DfsGenerator>(rng), QStringLiteral("DFS")};
-}
-
-} // namespace
+#include "generators/GeneratorCatalog.h"
 
 // ----------------- Generation -----------------
 
-void MazeModel::initGeneration(GeneratorType type)
+void MazeModel::initGeneration(const QString& generatorId)
 {
-    m_hasGeneratedMaze = false;
+    const GeneratorInfo *info = findGenerator(generatorId);
+    if (!info) {
+        emit statusUpdated(QString("Unknown generator: %1").arg(generatorId));
+        return;
+    }
 
-    GeneratorEntry entry = makeGenerator(type, m_rng);
-    m_generator = std::move(entry.generator);
-    m_generatorName = entry.name;
+    m_hasGeneratedMaze = false;
+    m_generator = info->make(m_rng);
+    m_generatorName = info->displayName;
 
     // The generator owns the starting grid state: some fill it with walls and
     // carve outwards, others start from an open room and add walls.
@@ -62,7 +42,7 @@ bool MazeModel::stepGeneration()
         ensureEndReachable();
 
         emit gridChanged();
-        emit statusUpdated(QString("Maze Generated (%1)").arg(m_generatorName));
+        emit statusUpdated(QString("Maze Generated: %1").arg(m_generatorName));
         return false;
     }
 
@@ -70,9 +50,9 @@ bool MazeModel::stepGeneration()
     return true;
 }
 
-void MazeModel::generateInstant(GeneratorType type)
+void MazeModel::generateInstant(const QString& generatorId)
 {
-    initGeneration(type);
+    initGeneration(generatorId);
     while (stepGeneration()) {
         // Spin until completion
     }

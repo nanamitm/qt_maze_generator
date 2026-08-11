@@ -14,12 +14,6 @@
 #include "MazeGenerator.h"
 #include "MazeGrid.h"
 
-enum class GeneratorType {
-    DFS,
-    Prim,
-    Division
-};
-
 enum class SolverType {
     BFS,
     DFS,
@@ -63,10 +57,10 @@ public:
     bool isValid(const QPoint& p) const;
     bool isValid(int r, int c) const;
 
-    // Control functions
-    void initGeneration(GeneratorType type);
+    // Control functions. The generator is named by its catalog id.
+    void initGeneration(const QString& generatorId);
     bool stepGeneration(); // Returns true if generation is still running, false if finished
-    void generateInstant(GeneratorType type);
+    void generateInstant(const QString& generatorId);
     void cancelGeneration();
 
     void initSolving(SolverType type);
