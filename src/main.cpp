@@ -8,6 +8,7 @@
 #include <QPixmap>
 
 #include <array>
+#include <cstdio>
 
 #include "MainWindow.h"
 #include "MazeModel.h"
@@ -109,6 +110,17 @@ QIcon createAppIcon()
     return icon;
 }
 
+// The executable is linked into the GUI subsystem, so Qt sees no console
+// attached and sends messages to OutputDebugString, discarding the self-test
+// result even when stderr is a perfectly usable inherited pipe. Bypass that
+// detection and write to stderr directly.
+void selfTestMessageHandler(QtMsgType, const QMessageLogContext &, const QString &message)
+{
+    fputs(qPrintable(message), stderr);
+    fputc('\n', stderr);
+    fflush(stderr);
+}
+
 bool hasSelfTestFlag(int argc, char *argv[])
 {
     for (int i = 1; i < argc; ++i) {
@@ -170,6 +182,7 @@ int main(int argc, char *argv[])
     // The self-test only exercises MazeModel, so it must not require a display.
     // Detect the flag before QApplication is constructed.
     if (hasSelfTestFlag(argc, argv)) {
+        qInstallMessageHandler(selfTestMessageHandler);
         QCoreApplication app(argc, argv);
         return runSelfTest();
     }

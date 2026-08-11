@@ -69,10 +69,13 @@ C:\Qt\Tools\CMake_64\bin\cmake.exe --build build --config Release
 ## Self Test
 
 ```powershell
-.\build\QtMazeGenerator.exe --self-test
+.\build\QtMazeGenerator.exe --self-test | Out-Host
+if ($LASTEXITCODE -ne 0) { "self-test failed" }
 ```
 
 The self-test runs all generator and solver combinations and exits with a non-zero code if any path cannot be solved. It also checks that the embedded stylesheet resolves. No display is required, so it can run on a headless machine.
+
+`| Out-Host` は必須です。実行ファイルは GUI サブシステムでリンクされているため、PowerShell から直接呼ぶと終了を待たず `$LASTEXITCODE` も更新されません（パイプすると待機します）。
 
 ## CI
 

@@ -32,4 +32,10 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Self test
-        run: .\build\QtMazeGenerator.exe --self-test
+        # The binary is a GUI-subsystem executable, so PowerShell does not wait
+        # for it and leaves $LASTEXITCODE untouched when invoked directly, which
+        # made this step pass no matter what the test returned. Piping forces
+        # PowerShell to wait, so the exit code is real.
+        run: |
+          .\build\QtMazeGenerator.exe --self-test | Out-Host
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
