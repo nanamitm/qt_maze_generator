@@ -266,23 +266,23 @@ struct StatsExpectation {
 };
 
 const std::array<StatsExpectation, 13> kStatsExpectations = {{
-    {"dfs",        10.0,  9.0, 1584},
-    {"huntkill",   10.0,  9.0,  471},
-    {"growingtree", 15.0, 15.0,  489},
-    {"growingtree-oldest", 2.0, 2.0, 226},
-    {"prim",       32.0, 27.0,  298},
-    {"kruskal",    31.0, 27.0,  436},
-    {"boruvka",    28.0, 25.0,  483},
-    {"eller",      28.0, 25.0,  438},
-    {"wilson",     30.0, 26.0,  342},
-    {"aldousbroder", 30.0, 26.0, 407},
-    {"binarytree", 25.0, 25.0,  232},
-    {"sidewinder", 29.0, 26.0,  241},
+    {"dfs",                10.0,  9.0, 1584},
+    {"huntkill",           10.0,  9.0,  471},
+    {"prim",               32.0, 27.0,  298},
+    {"kruskal",            31.0, 27.0,  436},
+    {"boruvka",            28.0, 25.0,  483},
+    {"growingtree",        15.0, 15.0,  489},
+    {"growingtree-oldest",  2.0,  2.0,  226},
+    {"wilson",             30.0, 26.0,  342},
+    {"aldousbroder",       30.0, 26.0,  407},
+    {"eller",              28.0, 25.0,  438},
+    {"sidewinder",         29.0, 26.0,  241},
+    {"binarytree",         25.0, 25.0,  232},
     // The reference lists 34% junctions for recursive division, which no
     // perfect maze can reach: in a spanning tree junctions <= dead ends - 2,
     // and every other algorithm in that reference obeys it. Taken as a typo
     // for 14%, which is what this implementation measures.
-    {"division",   15.0, 14.0,  378},
+    {"division",           15.0, 14.0,  378},
 }};
 
 // Single-sample references, and an algorithm's exact figures shift a little

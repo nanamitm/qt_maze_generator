@@ -1,7 +1,7 @@
 #include "generators/GeneratorCatalog.h"
 
-#include "generators/BinaryTreeGenerator.h"
 #include "generators/AldousBroderGenerator.h"
+#include "generators/BinaryTreeGenerator.h"
 #include "generators/BoruvkaGenerator.h"
 #include "generators/DfsGenerator.h"
 #include "generators/DivisionGenerator.h"
@@ -34,20 +34,22 @@ std::function<std::unique_ptr<MazeGenerator>(std::mt19937 &)> growingTree(Growin
 
 const std::vector<GeneratorInfo>& generatorCatalog()
 {
+    // Ordered roughly from the algorithms that walk the grid, through the ones
+    // that merge groups, to the ones that sweep it in a single pass.
     static const std::vector<GeneratorInfo> catalog = {
-        {QStringLiteral("dfs"),      QStringLiteral("Recursive Backtracker (DFS)"), factory<DfsGenerator>()},
-        {QStringLiteral("growingtree"), QStringLiteral("Growing Tree"),            growingTree(GrowingTreePolicy::Mixed)},
-        {QStringLiteral("growingtree-oldest"), QStringLiteral("Growing Tree (oldest)"), growingTree(GrowingTreePolicy::Oldest)},
-        {QStringLiteral("huntkill"), QStringLiteral("Hunt-and-Kill"),             factory<HuntAndKillGenerator>()},
-        {QStringLiteral("prim"),     QStringLiteral("Prim's Algorithm"),            factory<PrimGenerator>()},
-        {QStringLiteral("kruskal"),  QStringLiteral("Kruskal's Algorithm"),         factory<KruskalGenerator>()},
-        {QStringLiteral("boruvka"),  QStringLiteral("Boruvka's Algorithm"),         factory<BoruvkaGenerator>()},
-        {QStringLiteral("eller"),    QStringLiteral("Eller's Algorithm"),           factory<EllerGenerator>()},
-        {QStringLiteral("wilson"),   QStringLiteral("Wilson (Loop-Erased Walk)"),   factory<WilsonGenerator>()},
-        {QStringLiteral("aldousbroder"), QStringLiteral("Aldous-Broder (Random Walk)"), factory<AldousBroderGenerator>()},
-        {QStringLiteral("division"), QStringLiteral("Recursive Division"),          factory<DivisionGenerator>()},
-        {QStringLiteral("binarytree"), QStringLiteral("Binary Tree"),               factory<BinaryTreeGenerator>()},
-        {QStringLiteral("sidewinder"), QStringLiteral("Sidewinder"),                factory<SidewinderGenerator>()},
+        {QStringLiteral("dfs"),                QStringLiteral("Recursive Backtracker (DFS)"),  factory<DfsGenerator>()},
+        {QStringLiteral("huntkill"),           QStringLiteral("Hunt-and-Kill"),                factory<HuntAndKillGenerator>()},
+        {QStringLiteral("prim"),               QStringLiteral("Prim's Algorithm"),             factory<PrimGenerator>()},
+        {QStringLiteral("kruskal"),            QStringLiteral("Kruskal's Algorithm"),          factory<KruskalGenerator>()},
+        {QStringLiteral("boruvka"),            QStringLiteral("Boruvka's Algorithm"),          factory<BoruvkaGenerator>()},
+        {QStringLiteral("growingtree"),        QStringLiteral("Growing Tree"),                 growingTree(GrowingTreePolicy::Mixed)},
+        {QStringLiteral("growingtree-oldest"), QStringLiteral("Growing Tree (oldest first)"),  growingTree(GrowingTreePolicy::Oldest)},
+        {QStringLiteral("wilson"),             QStringLiteral("Wilson (Loop-Erased Walk)"),    factory<WilsonGenerator>()},
+        {QStringLiteral("aldousbroder"),       QStringLiteral("Aldous-Broder (Random Walk)"),  factory<AldousBroderGenerator>()},
+        {QStringLiteral("eller"),              QStringLiteral("Eller's Algorithm"),            factory<EllerGenerator>()},
+        {QStringLiteral("sidewinder"),         QStringLiteral("Sidewinder"),                   factory<SidewinderGenerator>()},
+        {QStringLiteral("binarytree"),         QStringLiteral("Binary Tree"),                  factory<BinaryTreeGenerator>()},
+        {QStringLiteral("division"),           QStringLiteral("Recursive Division"),           factory<DivisionGenerator>()},
     };
     return catalog;
 }
