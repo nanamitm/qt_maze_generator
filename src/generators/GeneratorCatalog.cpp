@@ -1,5 +1,6 @@
 #include "generators/GeneratorCatalog.h"
 
+#include "generators/BinaryTreeGenerator.h"
 #include "generators/DfsGenerator.h"
 #include "generators/DivisionGenerator.h"
 #include "generators/PrimGenerator.h"
@@ -22,6 +23,7 @@ const std::vector<GeneratorInfo>& generatorCatalog()
         {QStringLiteral("dfs"),      QStringLiteral("Recursive Backtracker (DFS)"), factory<DfsGenerator>()},
         {QStringLiteral("prim"),     QStringLiteral("Prim's Algorithm"),            factory<PrimGenerator>()},
         {QStringLiteral("division"), QStringLiteral("Recursive Division"),          factory<DivisionGenerator>()},
+        {QStringLiteral("binarytree"), QStringLiteral("Binary Tree"),               factory<BinaryTreeGenerator>()},
     };
     return catalog;
 }

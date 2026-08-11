@@ -212,7 +212,8 @@ struct StatsExpectation {
     double junctionPercent;
 };
 
-const std::array<StatsExpectation, 3> kStatsExpectations = {{
+const std::array<StatsExpectation, 4> kStatsExpectations = {{
+    {"binarytree", 25.0, 25.0},
     {"dfs",      10.0,  9.0},
     {"prim",     32.0, 27.0},
     // The reference lists 34% junctions for recursive division, which no
