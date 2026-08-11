@@ -8,7 +8,11 @@
 #include <queue>
 #include <deque>
 #include <map>
+#include <memory>
 #include <random>
+
+#include "MazeGenerator.h"
+#include "MazeGrid.h"
 
 enum class GeneratorType {
     DFS,
@@ -20,13 +24,6 @@ enum class SolverType {
     BFS,
     DFS,
     AStar
-};
-
-struct Cell {
-    bool isWall = true;
-    bool isVisited = false;
-    bool isFrontier = false;
-    bool isSolution = false;
 };
 
 // Compare struct for A* priority queue
@@ -43,10 +40,11 @@ class MazeModel : public QObject {
 
 public:
     explicit MazeModel(QObject *parent = nullptr);
+    ~MazeModel() override;
 
     void setSize(int w, int h);
-    int width() const { return m_width; }
-    int height() const { return m_height; }
+    int width() const { return m_grid.width(); }
+    int height() const { return m_grid.height(); }
 
     const Cell& cell(int row, int col) const;
     void setWall(int row, int col, bool isWall);
@@ -85,9 +83,7 @@ signals:
     void statusUpdated(const QString& status);
 
 private:
-    int m_width = 31;
-    int m_height = 31;
-    std::vector<std::vector<Cell>> m_grid;
+    MazeGrid m_grid;
 
     QPoint m_startPos;
     QPoint m_endPos;
@@ -97,33 +93,19 @@ private:
     bool m_finished = false;
     bool m_hasGeneratedMaze = false;
 
-    GeneratorType m_activeGenType = GeneratorType::DFS;
+    std::unique_ptr<MazeGenerator> m_generator;
+    QString m_generatorName;
     SolverType m_activeSolveType = SolverType::BFS;
 
     // Random number generator
     std::mt19937 m_rng;
 
     // Helper functions
-    std::vector<QPoint> getNeighbors(const QPoint& p, int distance) const;
-    std::vector<QPoint> getWalkableNeighbors(const QPoint& p) const;
     double heuristic(const QPoint& p1, const QPoint& p2) const;
     QPoint nearestMazeAnchor(const QPoint& p) const;
     void carveEndpointConnection(const QPoint& p);
     void ensureEndpointConnections();
     void ensureEndReachable();
-
-    // DFS Generator State
-    std::vector<QPoint> m_genStack;
-
-    // Prim Generator State
-    std::vector<QPoint> m_primCandidates;
-
-    // Recursive Division State
-    struct DivisionChamber {
-        int xStart, xEnd; // odd coordinates
-        int yStart, yEnd; // odd coordinates
-    };
-    std::vector<DivisionChamber> m_divisionStack;
 
     // Solver states
     std::deque<QPoint> m_solveQueue;                  // BFS

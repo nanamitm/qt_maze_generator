@@ -18,11 +18,23 @@ qt_add_executable(QtMazeGenerator
     src/MainWindow.cpp
     src/MazeCanvas.h
     src/MazeCanvas.cpp
+    src/MazeGrid.h
+    src/MazeGrid.cpp
+    src/MazeGenerator.h
     src/MazeModel.h
     src/MazeModel.cpp
     src/MazeModelGeneration.cpp
     src/MazeModelSolving.cpp
+    src/generators/DfsGenerator.h
+    src/generators/DfsGenerator.cpp
+    src/generators/PrimGenerator.h
+    src/generators/PrimGenerator.cpp
+    src/generators/DivisionGenerator.h
+    src/generators/DivisionGenerator.cpp
 )
+
+# So sources can include "MazeGrid.h" and "generators/DfsGenerator.h".
+target_include_directories(QtMazeGenerator PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if(WIN32)
     target_sources(QtMazeGenerator PRIVATE resources/app.rc)

@@ -19,8 +19,8 @@ void MazeModel::initSolving(SolverType type)
     m_generating = false;
     m_finished = false;
 
-    m_parentMap.assign(m_height, std::vector<QPoint>(m_width, QPoint(-1, -1)));
-    m_closedSet.assign(m_height, std::vector<bool>(m_width, false));
+    m_parentMap.assign(m_grid.height(), std::vector<QPoint>(m_grid.width(), QPoint(-1, -1)));
+    m_closedSet.assign(m_grid.height(), std::vector<bool>(m_grid.width(), false));
 
     m_grid[m_startPos.y()][m_startPos.x()].isFrontier = true;
 
@@ -34,7 +34,7 @@ void MazeModel::initSolving(SolverType type)
     }
     else if (type == SolverType::AStar) {
         while (!m_solveMinHeap.empty()) m_solveMinHeap.pop();
-        m_gScore.assign(m_height, std::vector<double>(m_width, 1e9));
+        m_gScore.assign(m_grid.height(), std::vector<double>(m_grid.width(), 1e9));
         m_gScore[m_startPos.y()][m_startPos.x()] = 0.0;
         m_solveMinHeap.push(AStarNode{m_startPos, heuristic(m_startPos, m_endPos)});
     }
@@ -78,7 +78,7 @@ bool MazeModel::stepSolving()
             return false;
         }
 
-        std::vector<QPoint> neighbors = getWalkableNeighbors(curr);
+        std::vector<QPoint> neighbors = m_grid.walkableNeighbors(curr);
         for (const auto& next : neighbors) {
             if (!m_grid[next.y()][next.x()].isVisited && !m_grid[next.y()][next.x()].isFrontier) {
                 m_parentMap[next.y()][next.x()] = curr;
@@ -118,7 +118,7 @@ bool MazeModel::stepSolving()
             return false;
         }
 
-        std::vector<QPoint> neighbors = getWalkableNeighbors(curr);
+        std::vector<QPoint> neighbors = m_grid.walkableNeighbors(curr);
         for (const auto& next : neighbors) {
             if (!m_grid[next.y()][next.x()].isVisited && !m_grid[next.y()][next.x()].isFrontier) {
                 m_parentMap[next.y()][next.x()] = curr;
@@ -164,7 +164,7 @@ bool MazeModel::stepSolving()
             return false;
         }
 
-        std::vector<QPoint> neighbors = getWalkableNeighbors(curr);
+        std::vector<QPoint> neighbors = m_grid.walkableNeighbors(curr);
         for (const auto& next : neighbors) {
             if (m_closedSet[next.y()][next.x()]) continue;
 
@@ -209,8 +209,10 @@ void MazeModel::cancelSolving()
     m_gScore.clear();
     m_closedSet.clear();
 
-    for (int r = 0; r < m_height; ++r) {
-        for (int c = 0; c < m_width; ++c) {
+    // Visited highlights are deliberately kept, so a cancelled solve still
+    // shows how far it got.
+    for (int r = 0; r < m_grid.height(); ++r) {
+        for (int c = 0; c < m_grid.width(); ++c) {
             m_grid[r][c].isFrontier = false;
             m_grid[r][c].isSolution = false;
         }
