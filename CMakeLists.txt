@@ -21,10 +21,20 @@ qt_add_executable(QtMazeGenerator
     src/MazeGrid.h
     src/MazeGrid.cpp
     src/MazeGenerator.h
+    src/MazeSolver.h
+    src/MazeSolver.cpp
     src/MazeModel.h
     src/MazeModel.cpp
     src/MazeModelGeneration.cpp
     src/MazeModelSolving.cpp
+    src/solvers/SolverCatalog.h
+    src/solvers/SolverCatalog.cpp
+    src/solvers/BfsSolver.h
+    src/solvers/BfsSolver.cpp
+    src/solvers/DfsSolver.h
+    src/solvers/DfsSolver.cpp
+    src/solvers/AStarSolver.h
+    src/solvers/AStarSolver.cpp
     src/generators/GeneratorCatalog.h
     src/generators/GeneratorCatalog.cpp
     src/generators/BinaryTreeGenerator.h

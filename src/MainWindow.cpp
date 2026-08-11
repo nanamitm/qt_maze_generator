@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "generators/GeneratorCatalog.h"
+#include "solvers/SolverCatalog.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -138,9 +139,9 @@ void MainWindow::setupUI()
     solveLayout->setSpacing(6);
 
     m_solveAlgoCombo = new QComboBox(solveGroup);
-    m_solveAlgoCombo->addItem("Breadth-First Search (BFS)", static_cast<int>(SolverType::BFS));
-    m_solveAlgoCombo->addItem("Depth-First Search (DFS)", static_cast<int>(SolverType::DFS));
-    m_solveAlgoCombo->addItem("A* Search Algorithm", static_cast<int>(SolverType::AStar));
+    for (const SolverInfo& info : solverCatalog()) {
+        m_solveAlgoCombo->addItem(info.displayName, info.id);
+    }
     solveLayout->addWidget(m_solveAlgoCombo);
 
     QHBoxLayout *solveButtonsLayout = new QHBoxLayout();
@@ -278,8 +279,7 @@ void MainWindow::onSolveClicked()
     }
 
     m_timer->stop();
-    SolverType solveType = static_cast<SolverType>(m_solveAlgoCombo->currentData().toInt());
-    m_model->initSolving(solveType);
+    m_model->initSolving(m_solveAlgoCombo->currentData().toString());
     m_timer->start();
     updateUIStates();
 }
@@ -287,8 +287,7 @@ void MainWindow::onSolveClicked()
 void MainWindow::onInstantSolveClicked()
 {
     m_timer->stop();
-    SolverType solveType = static_cast<SolverType>(m_solveAlgoCombo->currentData().toInt());
-    m_model->solveInstant(solveType);
+    m_model->solveInstant(m_solveAlgoCombo->currentData().toString());
     updateUIStates();
 }
 
@@ -400,7 +399,7 @@ int MainWindow::speedMultiplier() const
 
 int MainWindow::solvingStepsPerTick() const
 {
-    return speedMultiplier();
+    return speedMultiplier() * std::max(1, m_model->solverStepScale());
 }
 
 // Generators whose single step is a tiny change (random walks, for instance)

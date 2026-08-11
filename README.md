@@ -74,6 +74,8 @@ figures below are measured on an 88 x 47 grid of 4136 cells.
 Adding an algorithm means writing one class deriving from `MazeGenerator` and
 appending one row to `src/generators/GeneratorCatalog.cpp`. The algorithm combo
 box and the self-test both read the catalog, so neither needs to be touched.
+Solvers work the same way, through `MazeSolver` and
+`src/solvers/SolverCatalog.cpp`.
 
 ## Requirements
 

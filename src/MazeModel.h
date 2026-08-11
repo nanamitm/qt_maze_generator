@@ -5,29 +5,12 @@
 #include <QPoint>
 #include <QRect>
 #include <vector>
-#include <queue>
-#include <deque>
-#include <map>
 #include <memory>
 #include <random>
 
 #include "MazeGenerator.h"
 #include "MazeGrid.h"
-
-enum class SolverType {
-    BFS,
-    DFS,
-    AStar
-};
-
-// Compare struct for A* priority queue
-struct AStarNode {
-    QPoint pos;
-    double fScore;
-    bool operator>(const AStarNode& other) const {
-        return fScore > other.fScore;
-    }
-};
+#include "MazeSolver.h"
 
 class MazeModel : public QObject {
     Q_OBJECT
@@ -63,8 +46,10 @@ public:
     void setSeed(quint32 seed) { m_seed = seed; }
     quint32 seed() const { return m_seed; }
 
-    // How many steps of the active generator are worth showing in one frame.
+    // How many steps of the active generator or solver are worth showing in
+    // one frame.
     int generatorStepScale() const;
+    int solverStepScale() const;
 
     // Control functions. The generator is named by its catalog id.
     void initGeneration(const QString& generatorId);
@@ -72,9 +57,10 @@ public:
     void generateInstant(const QString& generatorId);
     void cancelGeneration();
 
-    void initSolving(SolverType type);
+    // The solver is likewise named by its catalog id.
+    void initSolving(const QString& solverId);
     bool stepSolving(); // Returns true if solving is still running, false if finished
-    void solveInstant(SolverType type);
+    void solveInstant(const QString& solverId);
     void cancelSolving();
 
     void clearAll();        // Resets the grid to all walls
@@ -98,26 +84,18 @@ private:
 
     std::unique_ptr<MazeGenerator> m_generator;
     QString m_generatorName;
-    SolverType m_activeSolveType = SolverType::BFS;
+    std::unique_ptr<MazeSolver> m_solver;
+    QString m_solverName;
 
     // Random number generator
     std::mt19937 m_rng;
     quint32 m_seed = 0;
 
     // Helper functions
-    double heuristic(const QPoint& p1, const QPoint& p2) const;
     QPoint nearestMazeAnchor(const QPoint& p) const;
     void carveEndpointConnection(const QPoint& p);
     void ensureEndpointConnections();
     void ensureEndReachable();
-
-    // Solver states
-    std::deque<QPoint> m_solveQueue;                  // BFS
-    std::vector<QPoint> m_solveStack;                 // DFS
-    std::priority_queue<AStarNode, std::vector<AStarNode>, std::greater<AStarNode>> m_solveMinHeap; // A*
-    std::vector<std::vector<QPoint>> m_parentMap;     // Parent pointer grid
-    std::vector<std::vector<double>> m_gScore;        // A* g scores
-    std::vector<std::vector<bool>> m_closedSet;       // Solver closed set
 };
 
 #endif // MAZEMODEL_H

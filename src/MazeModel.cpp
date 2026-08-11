@@ -122,11 +122,6 @@ bool MazeModel::isValid(int r, int c) const
     return m_grid.isValid(r, c);
 }
 
-double MazeModel::heuristic(const QPoint& p1, const QPoint& p2) const
-{
-    return std::abs(p1.x() - p2.x()) + std::abs(p1.y() - p2.y());
-}
-
 QPoint MazeModel::nearestMazeAnchor(const QPoint& p) const
 {
     int x = std::clamp(p.x(), 1, m_grid.width() - 2);

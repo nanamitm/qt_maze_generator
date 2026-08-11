@@ -14,6 +14,7 @@
 #include "MainWindow.h"
 #include "MazeModel.h"
 #include "generators/GeneratorCatalog.h"
+#include "solvers/SolverCatalog.h"
 
 namespace {
 
@@ -164,19 +165,6 @@ MazeStats measureMaze(const MazeModel& model)
         stats.junctionPercent = 100.0 * junctions / stats.cells;
     }
     return stats;
-}
-
-QString solverName(SolverType type)
-{
-    switch (type) {
-    case SolverType::BFS:
-        return "BFS";
-    case SolverType::DFS:
-        return "DFS";
-    case SolverType::AStar:
-        return "AStar";
-    }
-    return "Unknown";
 }
 
 QIcon createAppIcon()
@@ -360,12 +348,6 @@ int runSelfTest()
         return 1;
     }
 
-    const std::array<SolverType, 3> solvers = {
-        SolverType::BFS,
-        SolverType::DFS,
-        SolverType::AStar,
-    };
-
     if (!checkMazeStatistics()) {
         return 1;
     }
@@ -379,7 +361,7 @@ int runSelfTest()
             return 1;
         }
 
-        for (SolverType solver : solvers) {
+        for (const SolverInfo& solver : solverCatalog()) {
             MazeModel model;
             model.setSize(31, 31);
             model.generateInstant(generator.id);
@@ -389,11 +371,11 @@ int runSelfTest()
                 return 1;
             }
 
-            model.solveInstant(solver);
+            model.solveInstant(solver.id);
             const int pathLength = solutionCellCount(model);
             if (pathLength <= 0) {
                 qCritical() << "Solver did not find a path:"
-                            << generator.displayName << solverName(solver);
+                            << generator.displayName << solver.displayName;
                 return 1;
             }
             ++combinations;
