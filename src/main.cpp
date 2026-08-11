@@ -265,9 +265,11 @@ struct StatsExpectation {
     int longestPath;
 };
 
-const std::array<StatsExpectation, 6> kStatsExpectations = {{
+const std::array<StatsExpectation, 8> kStatsExpectations = {{
     {"dfs",        10.0,  9.0, 1584},
     {"huntkill",   10.0,  9.0,  471},
+    {"growingtree", 15.0, 15.0,  489},
+    {"growingtree-oldest", 2.0, 2.0, 226},
     {"prim",       32.0, 27.0,  298},
     {"binarytree", 25.0, 25.0,  232},
     {"sidewinder", 29.0, 26.0,  241},
