@@ -4,6 +4,7 @@
 #include "generators/DfsGenerator.h"
 #include "generators/DivisionGenerator.h"
 #include "generators/PrimGenerator.h"
+#include "generators/SidewinderGenerator.h"
 
 namespace {
 
@@ -24,6 +25,7 @@ const std::vector<GeneratorInfo>& generatorCatalog()
         {QStringLiteral("prim"),     QStringLiteral("Prim's Algorithm"),            factory<PrimGenerator>()},
         {QStringLiteral("division"), QStringLiteral("Recursive Division"),          factory<DivisionGenerator>()},
         {QStringLiteral("binarytree"), QStringLiteral("Binary Tree"),               factory<BinaryTreeGenerator>()},
+        {QStringLiteral("sidewinder"), QStringLiteral("Sidewinder"),                factory<SidewinderGenerator>()},
     };
     return catalog;
 }

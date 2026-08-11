@@ -212,10 +212,11 @@ struct StatsExpectation {
     double junctionPercent;
 };
 
-const std::array<StatsExpectation, 4> kStatsExpectations = {{
+const std::array<StatsExpectation, 5> kStatsExpectations = {{
+    {"dfs",        10.0,  9.0},
+    {"prim",       32.0, 27.0},
     {"binarytree", 25.0, 25.0},
-    {"dfs",      10.0,  9.0},
-    {"prim",     32.0, 27.0},
+    {"sidewinder", 29.0, 26.0},
     // The reference lists 34% junctions for recursive division, which no
     // perfect maze can reach: in a spanning tree junctions <= dead ends - 2,
     // and every other algorithm in that reference obeys it. Taken as a typo

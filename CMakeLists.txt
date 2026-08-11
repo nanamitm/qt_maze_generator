@@ -35,6 +35,8 @@ qt_add_executable(QtMazeGenerator
     src/generators/PrimGenerator.cpp
     src/generators/DivisionGenerator.h
     src/generators/DivisionGenerator.cpp
+    src/generators/SidewinderGenerator.h
+    src/generators/SidewinderGenerator.cpp
 )
 
 # So sources can include "MazeGrid.h" and "generators/DfsGenerator.h".
